@@ -461,7 +461,7 @@
       border-radius: 16px;
       width: 100%;
       max-width: 400px;
-      max-height: calc(100dvh - env(safe-area-inset-top) - 56px);
+      max-height: 85vh;
       display: flex;
       flex-direction: column;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
@@ -592,10 +592,9 @@
     }
 
     .modal-lista-scroll {
-      flex: 0 1 auto;
+      flex: 1;
       overflow-y: auto;
-      min-height: 56px;
-      max-height: 30vh;
+      max-height: 38vh;
       padding-right: 2px;
     }
 
@@ -607,7 +606,6 @@
 
     #modalListaPesos {
       margin-bottom: 12px;
-      min-height: 46px;
     }
 
     .peso-row {
@@ -885,7 +883,7 @@
 
     function getUnidadeModalAtual() {
       const produto = getProdutoModalAtual();
-      return String(produto && produto.unidade ? produto.unidade : 'kg').trim() || 'kg';
+      return produto && produto.unidade ? produto.unidade : 'kg';
     }
 
     function normalizarTiposCaixa(lista) {
@@ -1078,14 +1076,7 @@
 
       if (btnAddCaixa) {
         btnAddCaixa.addEventListener('click', () => {
-          if (modalIndexAtual === null) return;
-
-          const unidade = getUnidadeModalAtual();
-          const isKg = unidade.toLowerCase() === 'kg';
-
-          if (!isKg) return;
-
-          adicionarCaixaNoModal(unidade);
+          adicionarCaixaNoModal(getUnidadeModalAtual());
         });
       }
 
@@ -1194,22 +1185,14 @@
       `;
 
       const listaPesosContainer = document.getElementById('modalListaPesos');
-      const listaPesosScroll = document.querySelector('.modal-lista-scroll');
       const btnAddCaixa = document.getElementById('btnAddCaixaModal');
       const camposUnitarioContainer = document.getElementById('modalCamposUnitario');
       const tipoCaixaBox = document.getElementById('modalTipoCaixaBox');
-      const erroModal = document.getElementById('modalObservacaoErro');
-
-      if (erroModal) {
-        erroModal.classList.remove('visivel');
-        erroModal.textContent = '';
-      }
 
       configurarCampoObservacaoModal(produto);
 
       if (isKg) {
         listaPesosContainer.style.display = 'block';
-        if (listaPesosScroll) listaPesosScroll.style.display = 'block';
         btnAddCaixa.style.display = 'flex';
         if (camposUnitarioContainer) camposUnitarioContainer.style.display = 'none';
         if (tipoCaixaBox) tipoCaixaBox.style.display = 'block';
@@ -1231,17 +1214,14 @@
 
         const primeiroInput = document.querySelector('.peso-input');
         if (primeiroInput) {
-          setTimeout(() => {
-            primeiroInput.focus();
-            primeiroInput.select();
-          }, 0);
+          primeiroInput.focus();
+          primeiroInput.select();
         }
 
         atualizarResumoModal(produto.unidade || 'kg');
       } else {
         // Produtos unitários
         listaPesosContainer.style.display = 'none';
-        if (listaPesosScroll) listaPesosScroll.style.display = 'none';
         btnAddCaixa.style.display = 'none';
         if (camposUnitarioContainer) camposUnitarioContainer.style.display = 'block';
         if (tipoCaixaBox) tipoCaixaBox.style.display = 'none';
