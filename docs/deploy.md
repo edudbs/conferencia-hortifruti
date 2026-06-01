@@ -1,5 +1,3 @@
-# docs/deploy.md
-
 # Deploy
 
 ## Frontend — Cloudflare Pages
