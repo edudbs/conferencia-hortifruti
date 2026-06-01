@@ -3561,40 +3561,6 @@
     }
 
     function prepararIframeDrive() {
-      if (!window.listenerDriveConfigurado) {
-        window.addEventListener('message', (event) => {
-          const dados = event.data || {};
-
-          if (!salvamentoDriveEmAndamento) return;
-          if (!dados || typeof dados !== 'object') return;
-
-          salvamentoDriveEmAndamento = false;
-
-          const status = document.getElementById('statusRelatorioDrive');
-          const btn = document.getElementById('btnSalvarDrive');
-
-          if (btn) {
-            btn.disabled = false;
-            btn.textContent = 'Salvar no Drive';
-          }
-
-          if (!status) return;
-
-          if (dados.sucesso && dados.url) {
-            status.className = 'status-relatorio-drive sucesso';
-            status.innerHTML =
-              'PDF salvo no Drive com sucesso.<br>' +
-              '<a href="' + dados.url + '" target="_blank" rel="noopener noreferrer">Abrir PDF</a>';
-          } else {
-            status.className = 'status-relatorio-drive erro';
-            status.textContent =
-              'Erro ao salvar PDF no Drive: ' + (dados.erro || 'erro desconhecido.');
-          }
-        });
-
-        window.listenerDriveConfigurado = true;
-      }
-
       if (document.getElementById('iframeDrive')) return;
 
       const iframe = document.createElement('iframe');
