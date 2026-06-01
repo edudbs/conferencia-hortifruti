@@ -336,6 +336,17 @@
       margin-top: 2px;
     }
 
+    .review-observacao {
+      grid-column: 1 / -1;
+      margin-top: 4px;
+      padding: 7px 8px;
+      border-radius: 8px;
+      background: #f9fafb;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
     .review-alerta {
       background: var(--warning-bg);
       color: var(--warning-text);
@@ -514,6 +525,39 @@
     .modal-unitario-label {
       font-size: 15px;
       margin-bottom: 6px;
+    }
+
+    .modal-observacao-box {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .modal-observacao-box label {
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    .modal-observacao-ajuda {
+      margin: 6px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .modal-observacao-erro {
+      display: none;
+      margin-top: 6px;
+      padding: 8px;
+      border-radius: 8px;
+      background: #fee2e2;
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .modal-observacao-erro.visivel {
+      display: block;
     }
 
     .modal-close {
@@ -751,7 +795,7 @@
     /*
       MOCK LOCAL
       Só funciona localmente.
-      No Netlify ignora automaticamente.
+      No Cloudflare Pages ignora automaticamente.
     */
 
     window.MOCK_PRODUTOS = [
@@ -795,6 +839,64 @@
     let envioEmAndamento = false;
     let modalIndexAtual = null;
 
+    function produtoEhOutros(produto) {
+      const nome = String(produto && produto.produto ? produto.produto : '').trim().toUpperCase();
+      return nome.startsWith('OUTROS');
+    }
+
+    function configurarCampoObservacaoModal(produto) {
+      const campo = document.getElementById('modalObservacaoProduto');
+      const label = document.getElementById('modalObservacaoLabel');
+      const ajuda = document.getElementById('modalObservacaoAjuda');
+      const erro = document.getElementById('modalObservacaoErro');
+
+      if (!campo || !label || !ajuda || !erro) return;
+
+      const isOutros = produtoEhOutros(produto);
+
+      campo.value = produto.observacao || '';
+      erro.classList.remove('visivel');
+      erro.textContent = '';
+
+      if (isOutros) {
+        label.textContent = 'Descrição do produto *';
+        campo.placeholder = 'Ex: jiló, abacaxi pequeno, couve-flor...';
+        ajuda.textContent = 'Obrigatório para OUTROS. Informe qual produto foi conferido.';
+      } else {
+        label.textContent = 'Observação (opcional)';
+        campo.placeholder = 'Ex: caixa avariada, produto maduro, peso estimado...';
+        ajuda.textContent = 'Use apenas se houver alguma informação importante sobre este lançamento.';
+      }
+    }
+
+    function validarObservacaoModal(produto) {
+      const campo = document.getElementById('modalObservacaoProduto');
+      const erro = document.getElementById('modalObservacaoErro');
+
+      if (!campo) return true;
+
+      const texto = campo.value.trim();
+      const isOutros = produtoEhOutros(produto);
+
+      if (isOutros && !texto) {
+        if (erro) {
+          erro.textContent = 'Informe a descrição do produto para OUTROS.';
+          erro.classList.add('visivel');
+        }
+        campo.focus();
+        return false;
+      }
+
+      produto.observacao = texto;
+
+      if (erro) {
+        erro.classList.remove('visivel');
+        erro.textContent = '';
+      }
+
+      return true;
+    }
+
     // Funções de Controle da Pesagem Fracionada / Cálculo por Unidade
     function abrirModalPesagem(index) {
       modalIndexAtual = index;
@@ -821,6 +923,8 @@
       const listaPesosContainer = document.getElementById('modalListaPesos');
       const btnAddCaixa = document.getElementById('btnAddCaixaModal');
       const camposUnitarioContainer = document.getElementById('modalCamposUnitario');
+
+      configurarCampoObservacaoModal(produto);
 
       if (isKg) {
         listaPesosContainer.style.display = 'block';
@@ -1058,6 +1162,8 @@
 
       const inputCaixas = document.getElementById(`caixas_${modalIndexAtual}`);
       const inputQtdPeso = document.getElementById(`qtdpeso_${modalIndexAtual}`);
+
+      if (!validarObservacaoModal(produto)) return;
 
       if (isKg) {
         const inputs = document.querySelectorAll('.peso-input');
@@ -1391,7 +1497,7 @@
         pesosCaixas:
           produto.pesosCaixas || [],
 
-        observacao: '',
+        observacao: produto.observacao || '',
         originalIndex: index
 
       }));
@@ -1480,6 +1586,12 @@
                   value="${item.qtdPeso}"
                   readonly
                   tabindex="-1">
+
+                ${item.observacao ? `
+                  <div class="review-observacao">
+                    <strong>Observação:</strong> ${escapeHtml(item.observacao)}
+                  </div>
+                ` : ''}
 
               </div>
 
@@ -1710,6 +1822,11 @@
                 ${item.qtdPeso}
                 ${escapeHtml(unidade)}
 
+                ${item.observacao ? `
+                  <br>
+                  Observação: ${escapeHtml(item.observacao)}
+                ` : ''}
+
               </div>
 
             </div>
@@ -1867,6 +1984,15 @@
             <label for="modalInputItensPorCaixa" class="modal-unitario-label">Itens por caixa</label>
             <input type="number" id="modalInputItensPorCaixa" min="0" step="1" placeholder="0">
           </div>
+        </div>
+
+        <div class="modal-observacao-box">
+          <label for="modalObservacaoProduto" id="modalObservacaoLabel">Observação (opcional)</label>
+          <input type="text" id="modalObservacaoProduto" placeholder="Ex: caixa avariada, produto maduro...">
+          <p class="modal-observacao-ajuda" id="modalObservacaoAjuda">
+            Use apenas se houver alguma informação importante sobre este lançamento.
+          </p>
+          <div class="modal-observacao-erro" id="modalObservacaoErro"></div>
         </div>
       </div>
       <div class="modal-footer">
