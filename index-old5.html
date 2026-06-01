@@ -10,7 +10,7 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 
-  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=YTn_VlzE8Ap-uSDK4DjOSZWi6f_yyXJpq7tcr3xZtyCJFFFM3ymBxpy2t_IAKcZOjleEz_ghte2zsRPKM13rRRALY9SGsTP6Cfyjo2uKYaxXq7UAezNmYNvfvrYQ60nA7q9_bOFF2N_k9T0YyMkRJUQhPIyIyfV74IOWp2ifCRrq1RB-B3X76404lQKXG2fazCl6oN-_yczF-QPcfqk02YUlgCYwE-VwmPiSX_Mnfzg66QvzZQ-wQGlDAYS1vLySMYqkip40KZgMIxRO3MxjDqSKQPp4BoBxoFFR313thCcd6zoQWb9SnhEckkzDfxV9CU6FYjAlRH6MwJT4-RMHdQ" charset="UTF-8"></script><style>
+  <style>
     :root {
       --bg: #ffffff;
       --app-bg: #f4f7f5;
@@ -1352,10 +1352,15 @@
       const resumoDiv = document.getElementById('modalResumoTexto');
       const taraResumo = document.getElementById('modalTaraResumo');
 
-      resumoDiv.textContent = `${totais.totalCaixas} caixa(s) | Bruto: ${formatarNumero(totais.pesoBruto)} ${unidade} | Líquido: ${formatarNumero(totais.pesoLiquido)} ${unidade}`;
+      resumoDiv.textContent = `Líquido: ${formatarNumero(totais.pesoLiquido)} ${unidade} | ${totais.totalCaixas} caixa(s)`;
 
       if (taraResumo) {
-        taraResumo.textContent = '';
+        taraResumo.innerHTML = `
+          Bruto: <strong>${formatarNumero(totais.pesoBruto)} ${unidade}</strong><br>
+          Tara: <strong>${formatarNumero(totais.taraTotal)} kg</strong>
+          (${totais.totalCaixas} × ${formatarNumero(totais.taraUnitaria)} kg)<br>
+          Líquido para lançamento: <strong>${formatarNumero(totais.pesoLiquido)} ${unidade}</strong>
+        `;
       }
     }
 
@@ -2280,7 +2285,12 @@
         <div id="modalTipoCaixaBox" class="modal-tara-box" style="display: none;">
           <label for="modalTipoCaixa">Tipo de caixa / tara</label>
           <select id="modalTipoCaixa"></select>
-          <div id="modalTaraResumo" class="modal-tara-resumo" style="display: none;"></div>
+          <p class="modal-tara-ajuda">
+            O conferente informa o peso bruto. O sistema desconta a tara e grava o peso líquido em Qtd/Peso.
+          </p>
+          <div id="modalTaraResumo" class="modal-tara-resumo">
+            Selecione o tipo de caixa para calcular o peso líquido.
+          </div>
         </div>
 
         <div class="modal-lista-scroll">
