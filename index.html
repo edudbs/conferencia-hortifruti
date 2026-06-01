@@ -10,6 +10,9 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 
+  <script type="text/javascript"
+    src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=_1UHwXzqexCLCKtRtgVhLzJTK9ElS-DOrqwXktfwWx8ny0z2VBQKzXHmYTnLzn6T_DjUbgnNLqycQxsBn8pOyA_lfEPWGsyUIZfhhIVwEsyGEXEhuq1Ckdes4DJCFnZZrR8Ph54orQWocTIOi7c8u-JHv_7QYaHW-S1MZvlYwlPbgutXwOracTEGC3-kWWtMF8htuvUHucHNYuhz3wnmzjxBs2ILLSPz5QS9mWaVXTx2slLCL8Q_9jGBacJ9ZLbxWn6McRZPeyIUqC05lCjtZDPhWA7rRarNvfNglfKXTy99-kxfsZBdFu6BESit0he55tgXad4E7bt-UMgojd1fpg"
+    charset="UTF-8"></script>
   <style>
     :root {
       --bg: #ffffff;
@@ -839,9 +842,14 @@
     let envioEmAndamento = false;
     let modalIndexAtual = null;
 
-    function produtoEhOutros(produto) {
-      const nome = String(produto && produto.produto ? produto.produto : '').trim().toUpperCase();
-      return nome.startsWith('OUTROS');
+    function produtoEhOutro(produto) {
+      const nome = String(produto && produto.produto ? produto.produto : '')
+        .trim()
+        .toUpperCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+
+      return nome.startsWith('OUTRO');
     }
 
     function configurarCampoObservacaoModal(produto) {
@@ -852,16 +860,16 @@
 
       if (!campo || !label || !ajuda || !erro) return;
 
-      const isOutros = produtoEhOutros(produto);
+      const isOutro = produtoEhOutro(produto);
 
       campo.value = produto.observacao || '';
       erro.classList.remove('visivel');
       erro.textContent = '';
 
-      if (isOutros) {
+      if (isOutro) {
         label.textContent = 'Descrição do produto *';
         campo.placeholder = 'Ex: jiló, abacaxi pequeno, couve-flor...';
-        ajuda.textContent = 'Obrigatório para OUTROS. Informe qual produto foi conferido.';
+        ajuda.textContent = 'Obrigatório para OUTRO/OUTROS. Informe qual produto foi conferido.';
       } else {
         label.textContent = 'Observação (opcional)';
         campo.placeholder = 'Ex: caixa avariada, produto maduro, peso estimado...';
@@ -876,11 +884,11 @@
       if (!campo) return true;
 
       const texto = campo.value.trim();
-      const isOutros = produtoEhOutros(produto);
+      const isOutro = produtoEhOutro(produto);
 
-      if (isOutros && !texto) {
+      if (isOutro && !texto) {
         if (erro) {
-          erro.textContent = 'Informe a descrição do produto para OUTROS.';
+          erro.textContent = 'Informe a descrição do produto para OUTRO/OUTROS.';
           erro.classList.add('visivel');
         }
         campo.focus();
