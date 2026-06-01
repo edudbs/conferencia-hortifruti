@@ -1069,7 +1069,7 @@
       }
     }
 
-  
+
     .relatorio-tabela th:not(:first-child),
     .relatorio-tabela td:not(:first-child) {
       text-align: center;
@@ -1272,12 +1272,12 @@
 
 
     /* Ajustes de espaçamento da tela de revisão */
-    #telaRevisao .card > p {
+    #telaRevisao .card>p {
       padding-left: 6px;
       padding-right: 6px;
     }
 
-    #telaRevisao .review-row > div:first-child {
+    #telaRevisao .review-row>div:first-child {
       padding-left: 8px;
       padding-right: 6px;
     }
@@ -1675,8 +1675,7 @@
     .relatorio-acoes .btn {
       margin-bottom: 0;
     }
-
-</style>
+  </style>
 </head>
 
 <body>
@@ -2132,9 +2131,9 @@
       const dados = typeof pesagem === 'object' && pesagem !== null
         ? pesagem
         : {
-            caixas: pesagem ? 1 : '',
-            pesoBruto: pesagem || ''
-          };
+          caixas: pesagem ? 1 : '',
+          pesoBruto: pesagem || ''
+        };
 
       const row = document.createElement('div');
       row.className = 'peso-row pesagem-row';
@@ -2629,7 +2628,7 @@
           produto.pesosCaixas = Array(caixasTotais).fill(itensPorCaixa);
         } else {
           produto.pesagensKg = [];
-      produto.pesosCaixas = [];
+          produto.pesosCaixas = [];
         }
 
         produto.tipoCaixa = '';
@@ -3562,6 +3561,33 @@
     }
 
     function prepararIframeDrive() {
+      if (!window.listenerDriveConfigurado) {
+        window.addEventListener('message', (event) => {
+          const dados = event.data || {};
+
+          if (!salvamentoDriveEmAndamento) return;
+          if (typeof dados !== 'object') return;
+
+          salvamentoDriveEmAndamento = false;
+
+          const status = document.getElementById('statusRelatorioDrive');
+          if (!status) return;
+
+          if (dados.sucesso && dados.url) {
+            status.className = 'status-relatorio-drive sucesso';
+            status.innerHTML =
+              'PDF salvo no Drive com sucesso.<br>' +
+              '<a href="' + dados.url + '" target="_blank" rel="noopener noreferrer">Abrir PDF</a>';
+          } else {
+            status.className = 'status-relatorio-drive erro';
+            status.textContent =
+              'Erro ao salvar PDF no Drive: ' + (dados.erro || 'erro desconhecido.');
+          }
+        });
+
+        window.listenerDriveConfigurado = true;
+      }
+
       if (document.getElementById('iframeDrive')) return;
 
       const iframe = document.createElement('iframe');
@@ -3569,18 +3595,6 @@
       iframe.name = 'iframeDrive';
       iframe.id = 'iframeDrive';
       iframe.style.display = 'none';
-
-      iframe.addEventListener('load', () => {
-        if (!salvamentoDriveEmAndamento) return;
-
-        salvamentoDriveEmAndamento = false;
-
-        const status = document.getElementById('statusRelatorioDrive');
-        if (status) {
-          status.className = 'status-relatorio-drive sucesso';
-          status.textContent = 'PDF enviado para salvar no Drive.';
-        }
-      });
 
       document.body.appendChild(iframe);
     }
@@ -3665,9 +3679,9 @@
         const unidade = item.unidade || 'kg/un';
         const itemPayload = ultimoPayload && ultimoPayload.itens
           ? ultimoPayload.itens.find(origem =>
-              origem.codigo === item.codigo ||
-              origem.produto === item.produto
-            )
+            origem.codigo === item.codigo ||
+            origem.produto === item.produto
+          )
           : null;
 
         const codigoProduto = item.codigo || (itemPayload && itemPayload.codigo) || '-';
@@ -3866,7 +3880,8 @@
           </div>
         </div>
 
-        <button type="button" class="btn-observacao-toggle" id="btnToggleObservacao" onclick="alternarObservacaoModal()">
+        <button type="button" class="btn-observacao-toggle" id="btnToggleObservacao"
+          onclick="alternarObservacaoModal()">
           + Observação
         </button>
 
