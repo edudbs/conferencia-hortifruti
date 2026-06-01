@@ -3851,25 +3851,21 @@
         return;
       }
 
-      fetch(
-        APPS_SCRIPT_URL +
-        '?action=consultarPdfLancamento&requestId=' +
-        encodeURIComponent(requestId) +
-        '&t=' + Date.now()
-      )
-        .then(res => res.json())
-        .then(dados => {
+      const callbackName =
+        'receberPdfDrive_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+
+      window[callbackName] = function (dados) {
+        try {
           console.log('Resposta consultarPdfDrive:', dados);
 
-          if (dados && dados.ok === true && dados.data) {
-            dados = dados.data;
+          if (!dados || dados.pendente) {
+            setTimeout(() => {
+              consultarPdfDrive(requestId, tentativa + 1);
+            }, 1000);
+            return;
           }
 
-          if (dados && dados.sucesso === true && dados.data) {
-            dados = dados.data;
-          }
-
-          if (dados.pendente) {
+          if (!dados.url && !dados.erro) {
             setTimeout(() => {
               consultarPdfDrive(requestId, tentativa + 1);
             }, 1000);
@@ -3886,29 +3882,49 @@
             btn.textContent = 'Salvar no Drive';
           }
 
+          if (!status) return;
+
           if (dados.sucesso && dados.url) {
             status.className = 'status-relatorio-drive sucesso';
-
             status.innerHTML =
               'PDF salvo no Drive com sucesso.<br>' +
-              '<a href="' + dados.url + '" target="_blank" rel="noopener noreferrer">' +
-              'Abrir PDF' +
-              '</a>';
-
+              '<a href="' + dados.url + '" target="_blank" rel="noopener noreferrer">Abrir PDF</a>';
           } else {
             status.className = 'status-relatorio-drive erro';
-
             status.textContent =
-              'Erro ao salvar PDF no Drive: ' +
-              (dados.erro || 'erro desconhecido.');
+              'Erro ao salvar PDF no Drive: ' + (dados.erro || 'erro desconhecido.');
           }
-        })
-        .catch(() => {
-          setTimeout(() => {
-            consultarPdfDrive(requestId, tentativa + 1);
-          }, 1000);
-        });
+        } finally {
+          delete window[callbackName];
+
+          const script = document.getElementById(callbackName);
+          if (script) script.remove();
+        }
+      };
+
+      const script = document.createElement('script');
+      script.id = callbackName;
+      script.src =
+        APPS_SCRIPT_URL +
+        '?action=consultarPdfLancamento' +
+        '&requestId=' + encodeURIComponent(requestId) +
+        '&callback=' + encodeURIComponent(callbackName) +
+        '&t=' + Date.now();
+
+      script.onerror = () => {
+        delete window[callbackName];
+
+        const antigo = document.getElementById(callbackName);
+        if (antigo) antigo.remove();
+
+        setTimeout(() => {
+          consultarPdfDrive(requestId, tentativa + 1);
+        }, 1000);
+      };
+
+      document.body.appendChild(script);
     }
+
   </script>
 
   <!-- Modal de Pesagem Fracionada / Lançamento Unitário -->
