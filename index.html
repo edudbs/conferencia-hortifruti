@@ -3566,11 +3566,18 @@
           const dados = event.data || {};
 
           if (!salvamentoDriveEmAndamento) return;
-          if (typeof dados !== 'object') return;
+          if (!dados || typeof dados !== 'object') return;
 
           salvamentoDriveEmAndamento = false;
 
           const status = document.getElementById('statusRelatorioDrive');
+          const btn = document.getElementById('btnSalvarDrive');
+
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Salvar no Drive';
+          }
+
           if (!status) return;
 
           if (dados.sucesso && dados.url) {
@@ -3598,7 +3605,6 @@
 
       document.body.appendChild(iframe);
     }
-
     function salvarRelatorioDrive() {
       if (IS_LOCAL) {
         const status = document.getElementById('statusRelatorioDrive');
@@ -3610,6 +3616,15 @@
       }
 
       if (!validarConfiguracao()) return;
+
+
+      if (salvamentoDriveEmAndamento) return;
+
+      const btnSalvarDrive = document.getElementById('btnSalvarDrive');
+      if (btnSalvarDrive) {
+        btnSalvarDrive.disabled = true;
+        btnSalvarDrive.textContent = 'Salvando...';
+      }
 
       const resposta =
         ultimaRespostaConferencia ||
@@ -3710,7 +3725,7 @@
             Imprimir / Salvar PDF
           </button>
 
-          <button class="btn btn-secondary" onclick="salvarRelatorioDrive()">
+          <button class="btn btn-secondary" id="btnSalvarDrive" onclick="salvarRelatorioDrive()">
             Salvar no Drive
           </button>
 
