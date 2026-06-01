@@ -765,87 +765,6 @@
     .btn-limpar:hover {
       background: #fecaca;
     }
-
-
-    .modal-card {
-      background: #ffffff;
-      border-radius: 16px;
-      width: 100%;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      animation: modalSlideUp 0.25s ease-out;
-    }
-
-    #modalSemTara {
-      display: none;
-      z-index: 1100;
-    }
-
-    #modalSemTara.ativo {
-      display: flex;
-    }
-
-    .modal-alerta {
-      max-width: 360px;
-      padding: 18px 16px 16px;
-      text-align: center;
-    }
-
-    .modal-alerta-icone {
-      font-size: 34px;
-      margin-bottom: 8px;
-    }
-
-    .modal-alerta h3 {
-      margin: 0 0 8px;
-      font-size: 20px;
-      color: var(--primary-dark);
-    }
-
-    .modal-alerta p {
-      margin: 0 0 12px;
-      color: var(--text);
-      line-height: 1.35;
-    }
-
-    .modal-alerta-resumo {
-      margin: 12px 0 18px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: #fff7ed;
-      color: #7c2d12;
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.35;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .modal-actions button {
-      flex: 1;
-      border: none;
-      border-radius: 10px;
-      padding: 12px;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .btn-secundario {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
-    .btn-principal {
-      background: var(--primary);
-      color: #ffffff;
-    }
-
-    .btn-principal:hover {
-      background: var(--primary-dark);
-    }
   </style>
 </head>
 
@@ -1518,41 +1437,16 @@
     }
 
     function confirmarSemDescontoTara(totais) {
-      if (Number(totais.taraUnitaria || 0) > 0) {
-        return Promise.resolve(true);
-      }
+      if (Number(totais.taraUnitaria || 0) > 0) return true;
 
-      return new Promise((resolve) => {
-        const modal = document.getElementById('modalSemTara');
-        const resumo = document.getElementById('resumoSemTara');
-        const btnVoltar = document.getElementById('btnVoltarTara');
-        const btnContinuar = document.getElementById('btnContinuarSemTara');
-
-        if (!modal || !resumo || !btnVoltar || !btnContinuar) {
-          resolve(true);
-          return;
-        }
-
-        resumo.textContent =
-          totais.totalCaixas + ' caixa(s) | ' +
-          'Bruto: ' + formatarNumero(totais.pesoBruto) + ' kg | ' +
-          'Líquido: ' + formatarNumero(totais.pesoLiquido) + ' kg';
-
-        modal.classList.add('ativo');
-
-        btnVoltar.onclick = () => {
-          modal.classList.remove('ativo');
-          resolve(false);
-        };
-
-        btnContinuar.onclick = () => {
-          modal.classList.remove('ativo');
-          resolve(true);
-        };
-      });
+      return confirm(
+        `Este lançamento está sem desconto de tara.\n\n` +
+        `${totais.totalCaixas} caixa(s) | Bruto: ${formatarNumero(totais.pesoBruto)} kg | Líquido: ${formatarNumero(totais.pesoLiquido)} kg\n\n` +
+        `Deseja continuar mesmo assim?`
+      );
     }
 
-    async function confirmarPesagem() {
+    function confirmarPesagem() {
       if (modalIndexAtual === null) return;
 
       const produto = produtos[modalIndexAtual];
@@ -1577,9 +1471,7 @@
           return;
         }
 
-        const podeContinuarSemTara = await confirmarSemDescontoTara(totais);
-
-        if (!podeContinuarSemTara) {
+        if (!confirmarSemDescontoTara(totais)) {
           return;
         }
 
@@ -2506,30 +2398,6 @@
           <button type="button" class="btn-cancelar" onclick="fecharModalPesagem()">Cancelar</button>
           <button type="button" class="btn-salvar" id="btnSalvarModal">Confirmar e Aplicar</button>
         </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- Modal de Confirmação Sem Tara -->
-  <div id="modalSemTara" class="modal-overlay">
-    <div class="modal-card modal-alerta">
-      <div class="modal-alerta-icone">⚠️</div>
-
-      <h3>Atenção</h3>
-
-      <p>Este lançamento está sem desconto de tara.</p>
-
-      <div id="resumoSemTara" class="modal-alerta-resumo"></div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn-secundario" id="btnVoltarTara">
-          Voltar
-        </button>
-
-        <button type="button" class="btn-principal" id="btnContinuarSemTara">
-          Continuar sem desconto
-        </button>
       </div>
     </div>
   </div>
