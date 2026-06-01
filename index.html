@@ -235,16 +235,6 @@
       color: #374151;
     }
 
-    .obs-compacta {
-      grid-column: 1 / -1;
-      display: none;
-      margin-top: 4px;
-    }
-
-    .produto-card:focus-within .obs-compacta {
-      display: block;
-    }
-
     .btn {
       width: 100%;
       border: none;
@@ -771,7 +761,7 @@
       </div>
 
       <div id="listaProdutos" class="card produtos-card">
-        <div class="loading">
+        <div class="loading" aria-live="polite">
           Carregando produtos...
         </div>
       </div>
@@ -839,6 +829,16 @@
     let envioEmAndamento = false;
     let modalIndexAtual = null;
 
+    function getProdutoModalAtual() {
+      if (modalIndexAtual === null) return null;
+      return produtos[modalIndexAtual] || null;
+    }
+
+    function getUnidadeModalAtual() {
+      const produto = getProdutoModalAtual();
+      return produto && produto.unidade ? produto.unidade : 'kg';
+    }
+
     function produtoEhOutro(produto) {
       const nome = String(produto && produto.produto ? produto.produto : '')
         .trim()
@@ -902,6 +902,108 @@
       return true;
     }
 
+    function atualizarResumoUnitarioModal() {
+      const produto = getProdutoModalAtual();
+      if (!produto) return;
+
+      const inputCaixasTotais = document.getElementById('modalInputCaixasTotais');
+      const inputItensPorCaixa = document.getElementById('modalInputItensPorCaixa');
+
+      const cx = parseInt(inputCaixasTotais.value) || 0;
+      const itens = parseInt(inputItensPorCaixa.value) || 0;
+      const totalItens = cx * itens;
+
+      const resumoDiv = document.getElementById('modalResumoTexto');
+      resumoDiv.textContent = `Total: ${cx} caixa(s) | ${totalItens} ${produto.unidade || 'un'}`;
+    }
+
+    function configurarEventosModal() {
+      const btnAddCaixa = document.getElementById('btnAddCaixaModal');
+      const btnSalvar = document.getElementById('btnSalvarModal');
+      const inputCaixasTotais = document.getElementById('modalInputCaixasTotais');
+      const inputItensPorCaixa = document.getElementById('modalInputItensPorCaixa');
+
+      if (btnAddCaixa) {
+        btnAddCaixa.addEventListener('click', () => {
+          adicionarCaixaNoModal(getUnidadeModalAtual());
+        });
+      }
+
+      if (btnSalvar) {
+        btnSalvar.addEventListener('click', confirmarPesagem);
+      }
+
+      if (inputCaixasTotais && inputItensPorCaixa) {
+        inputCaixasTotais.addEventListener('input', atualizarResumoUnitarioModal);
+        inputItensPorCaixa.addEventListener('input', atualizarResumoUnitarioModal);
+
+        inputCaixasTotais.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            inputItensPorCaixa.focus();
+            inputItensPorCaixa.select();
+          }
+        });
+
+        inputItensPorCaixa.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            confirmarPesagem();
+          }
+        });
+      }
+    }
+
+    function criarLinhaPesoModal(peso, index, unidade) {
+      const row = document.createElement('div');
+      row.className = 'peso-row';
+      row.id = `pesoRow_${index}`;
+
+      const label = document.createElement('div');
+      label.className = 'peso-label';
+      label.textContent = `Caixa ${index + 1}`;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'peso-input-wrapper';
+
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.className = 'peso-input';
+      input.step = '0.001';
+      input.min = '0';
+      input.placeholder = '0.000';
+      input.value = peso ?? '';
+
+      input.addEventListener('input', () => {
+        atualizarResumoModal(unidade);
+      });
+
+      input.addEventListener('keydown', (event) => {
+        tratarTeclasModal(event, index, unidade);
+      });
+
+      const badge = document.createElement('span');
+      badge.className = 'peso-unit-badge';
+      badge.textContent = unidade;
+
+      wrapper.appendChild(input);
+      wrapper.appendChild(badge);
+
+      const btnRemover = document.createElement('button');
+      btnRemover.type = 'button';
+      btnRemover.className = 'btn-remover-peso';
+      btnRemover.textContent = '❌';
+      btnRemover.addEventListener('click', () => {
+        removerCaixaNoModal(index, unidade);
+      });
+
+      row.appendChild(label);
+      row.appendChild(wrapper);
+      row.appendChild(btnRemover);
+
+      return row;
+    }
+
     // Funções de Controle da Pesagem Fracionada / Cálculo por Unidade
     function abrirModalPesagem(index) {
       modalIndexAtual = index;
@@ -945,14 +1047,6 @@
           pesos.push('');
         }
 
-        document.getElementById('btnAddCaixaModal').onclick = () => {
-          adicionarCaixaNoModal(produto.unidade || 'kg');
-        };
-
-        document.getElementById('btnSalvarModal').onclick = () => {
-          confirmarPesagem();
-        };
-
         renderizarLinhasModal(pesos, produto.unidade || 'kg');
 
         document.getElementById('modalPesagem').style.display = 'flex';
@@ -983,7 +1077,11 @@
         let itensPorCaixa = produto.itensPorCaixa;
 
         if (mainCaixas > 0 && mainQtd > 0) {
-          if (mainCaixas !== produto.caixasTotais || mainQtd !== (produto.caixasTotais * produto.itensPorCaixa)) {
+          const totalEsperado =
+            (Number(produto.caixasTotais) || 0) *
+            (Number(produto.itensPorCaixa) || 0);
+
+          if (mainCaixas !== produto.caixasTotais || mainQtd !== totalEsperado) {
             caixasTotais = mainCaixas;
             itensPorCaixa = Math.round(mainQtd / mainCaixas);
           }
@@ -998,66 +1096,21 @@
         inputCaixasTotais.value = caixasTotais !== undefined ? caixasTotais : '';
         inputItensPorCaixa.value = itensPorCaixa !== undefined ? itensPorCaixa : '';
 
-        const atualizarResumoUnitario = () => {
-          const cx = parseInt(inputCaixasTotais.value) || 0;
-          const itens = parseInt(inputItensPorCaixa.value) || 0;
-          const totalItens = cx * itens;
-
-          const resumoDiv = document.getElementById('modalResumoTexto');
-          resumoDiv.textContent = `Total: ${cx} caixa(s) | ${totalItens} ${produto.unidade || 'un'}`;
-        };
-
-        inputCaixasTotais.oninput = atualizarResumoUnitario;
-        inputItensPorCaixa.oninput = atualizarResumoUnitario;
-
-        inputCaixasTotais.onkeydown = (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            inputItensPorCaixa.focus();
-            inputItensPorCaixa.select();
-          }
-        };
-        inputItensPorCaixa.onkeydown = (e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            confirmarPesagem();
-          }
-        };
-
-        document.getElementById('btnSalvarModal').onclick = () => {
-          confirmarPesagem();
-        };
-
         document.getElementById('modalPesagem').style.display = 'flex';
         inputCaixasTotais.focus();
         inputCaixasTotais.select();
 
-        atualizarResumoUnitario();
+        atualizarResumoUnitarioModal();
       }
     }
 
     function renderizarLinhasModal(pesos, unidade) {
       const container = document.getElementById('modalListaPesos');
-      container.innerHTML = pesos.map((peso, index) => `
-        <div class="peso-row" id="pesoRow_${index}">
-          <div class="peso-label">Caixa ${index + 1}</div>
-          <div class="peso-input-wrapper">
-            <input 
-              type="number" 
-              class="peso-input" 
-              step="0.001" 
-              min="0" 
-              placeholder="0.000" 
-              value="${peso}" 
-              oninput="atualizarResumoModal('${unidade}')"
-              onkeydown="tratarTeclasModal(event, ${index}, '${unidade}')">
-            <span class="peso-unit-badge">${escapeHtml(unidade)}</span>
-          </div>
-          <button type="button" class="btn-remover-peso" onclick="removerCaixaNoModal(${index}, '${unidade}')">
-            ❌
-          </button>
-        </div>
-      `).join('');
+      const linhas = pesos.map((peso, index) =>
+        criarLinhaPesoModal(peso, index, unidade)
+      );
+
+      container.replaceChildren(...linhas);
     }
 
     function tratarTeclasModal(event, index, unidade) {
@@ -1075,36 +1128,12 @@
 
     function adicionarCaixaNoModal(unidade) {
       const container = document.getElementById('modalListaPesos');
-      const numCaixas = container.querySelectorAll('.peso-row').length;
+      const newIndex = container.querySelectorAll('.peso-row').length;
+      const novaLinha = criarLinhaPesoModal('', newIndex, unidade);
 
-      const newIndex = numCaixas;
-      const html = `
-        <div class="peso-row" id="pesoRow_${newIndex}">
-          <div class="peso-label">Caixa ${newIndex + 1}</div>
-          <div class="peso-input-wrapper">
-            <input 
-              type="number" 
-              class="peso-input" 
-              step="0.001" 
-              min="0" 
-              placeholder="0.000" 
-              value="" 
-              oninput="atualizarResumoModal('${unidade}')"
-              onkeydown="tratarTeclasModal(event, ${newIndex}, '${unidade}')">
-            <span class="peso-unit-badge">${escapeHtml(unidade)}</span>
-          </div>
-          <button type="button" class="btn-remover-peso" onclick="removerCaixaNoModal(${newIndex}, '${unidade}')">
-            ❌
-          </button>
-        </div>
-      `;
+      container.appendChild(novaLinha);
 
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = html;
-      container.appendChild(tempDiv.firstElementChild);
-
-      const inputs = container.querySelectorAll('.peso-input');
-      const novoInput = inputs[inputs.length - 1];
+      const novoInput = novaLinha.querySelector('.peso-input');
       if (novoInput) {
         novoInput.focus();
       }
@@ -1158,6 +1187,18 @@
       modalIndexAtual = null;
     }
 
+    function exibirErroModal(mensagem) {
+      const erro = document.getElementById('modalObservacaoErro');
+
+      if (!erro) {
+        alert(mensagem);
+        return;
+      }
+
+      erro.textContent = mensagem;
+      erro.classList.add('visivel');
+    }
+    
     function confirmarPesagem() {
       if (modalIndexAtual === null) return;
 
@@ -1188,6 +1229,11 @@
           }
         });
 
+        if (totalCaixas <= 0 || totalPeso <= 0) {
+          exibirErroModal('Informe pelo menos um peso maior que zero.');
+          return;
+        }
+        
         produto.pesosCaixas = pesos;
 
         if (inputCaixas) {
@@ -1204,6 +1250,11 @@
         const itensPorCaixa = parseInt(inputItensPorCaixa.value) || 0;
         const totalItens = caixasTotais * itensPorCaixa;
 
+        if (caixasTotais <= 0 || itensPorCaixa <= 0) {
+          exibirErroModal('Informe o total de caixas/sacos e os itens por caixa.');
+          return;
+        }
+        
         produto.caixasTotais = caixasTotais > 0 ? caixasTotais : '';
         produto.itensPorCaixa = itensPorCaixa > 0 ? itensPorCaixa : '';
 
@@ -1233,6 +1284,8 @@
       const mes = String(hoje.getMonth() + 1).padStart(2, '0');
       const dia = String(hoje.getDate()).padStart(2, '0');
       document.getElementById('dataConferencia').value = `${ano}-${mes}-${dia}`;
+
+      configurarEventosModal();
 
       prepararIframeEnvio();
 
