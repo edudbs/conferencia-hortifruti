@@ -724,6 +724,7 @@
     .modal-botoes {
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .modal-botoes button {
@@ -752,6 +753,17 @@
 
     .btn-salvar:hover {
       background: var(--primary-dark);
+    }
+
+    .btn-limpar {
+      flex-basis: 100%;
+      background: #fee2e2;
+      color: var(--danger);
+      border: 1px solid #fecaca !important;
+    }
+
+    .btn-limpar:hover {
+      background: #fecaca;
     }
   </style>
 </head>
@@ -1072,6 +1084,7 @@
     function configurarEventosModal() {
       const btnAddCaixa = document.getElementById('btnAddCaixaModal');
       const btnSalvar = document.getElementById('btnSalvarModal');
+      const btnLimpar = document.getElementById('btnLimparModal');
       const inputCaixasTotais = document.getElementById('modalInputCaixasTotais');
       const inputItensPorCaixa = document.getElementById('modalInputItensPorCaixa');
       const selectTipoCaixa = document.getElementById('modalTipoCaixa');
@@ -1091,6 +1104,10 @@
 
       if (btnSalvar) {
         btnSalvar.addEventListener('click', confirmarPesagem);
+      }
+
+      if (btnLimpar) {
+        btnLimpar.addEventListener('click', limparLancamentoAtual);
       }
 
       if (selectTipoCaixa) {
@@ -1135,9 +1152,9 @@
       const input = document.createElement('input');
       input.type = 'number';
       input.className = 'peso-input';
+      input.step = '0.001';
       input.inputMode = 'decimal';
       input.enterKeyHint = 'next';
-      input.step = '0.001';
       input.min = '0';
       input.placeholder = '0.000';
       input.value = peso ?? '';
@@ -1152,10 +1169,6 @@
           event.stopPropagation();
           tratarTeclasModal(event, index, unidade);
         }
-      });
-
-      input.addEventListener('focus', () => {
-        input.select();
       });
 
       const badge = document.createElement('span');
@@ -1216,6 +1229,13 @@
       }
 
       configurarCampoObservacaoModal(produto);
+
+      const campoObservacaoModal = document.getElementById('modalObservacaoProduto');
+      if (campoObservacaoModal) {
+        // No Android, o botão "Próximo" do teclado costuma pular para a observação.
+        // Retirar a observação da sequência de foco mantém o fluxo nas caixas; o campo continua clicável/toque.
+        campoObservacaoModal.tabIndex = isKg ? -1 : 0;
+      }
 
       if (isKg) {
         listaPesosContainer.style.display = 'block';
@@ -1385,6 +1405,36 @@
       erro.textContent = mensagem;
       erro.classList.add('visivel');
     }
+    
+
+    function limparLancamentoAtual() {
+      if (modalIndexAtual === null) return;
+
+      const produto = produtos[modalIndexAtual];
+      const inputCaixas = document.getElementById(`caixas_${modalIndexAtual}`);
+      const inputQtdPeso = document.getElementById(`qtdpeso_${modalIndexAtual}`);
+      const campoObservacao = document.getElementById('modalObservacaoProduto');
+      const erro = document.getElementById('modalObservacaoErro');
+
+      produto.pesosCaixas = [];
+      produto.caixasTotais = '';
+      produto.itensPorCaixa = '';
+      produto.tipoCaixa = '';
+      produto.taraUnitaria = 0;
+      produto.taraTotal = 0;
+      produto.pesoBruto = 0;
+      produto.observacao = '';
+
+      if (inputCaixas) inputCaixas.value = '';
+      if (inputQtdPeso) inputQtdPeso.value = '';
+      if (campoObservacao) campoObservacao.value = '';
+      if (erro) {
+        erro.classList.remove('visivel');
+        erro.textContent = '';
+      }
+
+      fecharModalPesagem();
+    }
 
     function confirmarPesagem() {
       if (modalIndexAtual === null) return;
@@ -1435,7 +1485,7 @@
           exibirErroModal('Informe o total de caixas/sacos e os itens por caixa.');
           return;
         }
-
+        
         produto.caixasTotais = caixasTotais > 0 ? caixasTotais : '';
         produto.itensPorCaixa = itensPorCaixa > 0 ? itensPorCaixa : '';
 
@@ -2330,6 +2380,7 @@
           Total: 0 caixas | 0 kg
         </div>
         <div class="modal-botoes">
+          <button type="button" class="btn-limpar" id="btnLimparModal">Limpar lançamento</button>
           <button type="button" class="btn-cancelar" onclick="fecharModalPesagem()">Cancelar</button>
           <button type="button" class="btn-salvar" id="btnSalvarModal">Confirmar e Aplicar</button>
         </div>

@@ -461,7 +461,7 @@
       border-radius: 16px;
       width: 100%;
       max-width: 400px;
-      max-height: 85vh;
+      max-height: calc(100dvh - env(safe-area-inset-top) - 56px);
       display: flex;
       flex-direction: column;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
@@ -592,9 +592,10 @@
     }
 
     .modal-lista-scroll {
-      flex: 1;
+      flex: 0 1 auto;
       overflow-y: auto;
-      max-height: 38vh;
+      min-height: 56px;
+      max-height: 30vh;
       padding-right: 2px;
     }
 
@@ -606,6 +607,7 @@
 
     #modalListaPesos {
       margin-bottom: 12px;
+      min-height: 46px;
     }
 
     .peso-row {
@@ -883,7 +885,7 @@
 
     function getUnidadeModalAtual() {
       const produto = getProdutoModalAtual();
-      return produto && produto.unidade ? produto.unidade : 'kg';
+      return String(produto && produto.unidade ? produto.unidade : 'kg').trim() || 'kg';
     }
 
     function normalizarTiposCaixa(lista) {
@@ -1076,7 +1078,14 @@
 
       if (btnAddCaixa) {
         btnAddCaixa.addEventListener('click', () => {
-          adicionarCaixaNoModal(getUnidadeModalAtual());
+          if (modalIndexAtual === null) return;
+
+          const unidade = getUnidadeModalAtual();
+          const isKg = unidade.toLowerCase() === 'kg';
+
+          if (!isKg) return;
+
+          adicionarCaixaNoModal(unidade);
         });
       }
 
@@ -1126,6 +1135,8 @@
       const input = document.createElement('input');
       input.type = 'number';
       input.className = 'peso-input';
+      input.inputMode = 'decimal';
+      input.enterKeyHint = 'next';
       input.step = '0.001';
       input.min = '0';
       input.placeholder = '0.000';
@@ -1136,7 +1147,15 @@
       });
 
       input.addEventListener('keydown', (event) => {
-        tratarTeclasModal(event, index, unidade);
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          event.stopPropagation();
+          tratarTeclasModal(event, index, unidade);
+        }
+      });
+
+      input.addEventListener('focus', () => {
+        input.select();
       });
 
       const badge = document.createElement('span');
@@ -1185,14 +1204,22 @@
       `;
 
       const listaPesosContainer = document.getElementById('modalListaPesos');
+      const listaPesosScroll = document.querySelector('.modal-lista-scroll');
       const btnAddCaixa = document.getElementById('btnAddCaixaModal');
       const camposUnitarioContainer = document.getElementById('modalCamposUnitario');
       const tipoCaixaBox = document.getElementById('modalTipoCaixaBox');
+      const erroModal = document.getElementById('modalObservacaoErro');
+
+      if (erroModal) {
+        erroModal.classList.remove('visivel');
+        erroModal.textContent = '';
+      }
 
       configurarCampoObservacaoModal(produto);
 
       if (isKg) {
         listaPesosContainer.style.display = 'block';
+        if (listaPesosScroll) listaPesosScroll.style.display = 'block';
         btnAddCaixa.style.display = 'flex';
         if (camposUnitarioContainer) camposUnitarioContainer.style.display = 'none';
         if (tipoCaixaBox) tipoCaixaBox.style.display = 'block';
@@ -1214,14 +1241,17 @@
 
         const primeiroInput = document.querySelector('.peso-input');
         if (primeiroInput) {
-          primeiroInput.focus();
-          primeiroInput.select();
+          setTimeout(() => {
+            primeiroInput.focus();
+            primeiroInput.select();
+          }, 0);
         }
 
         atualizarResumoModal(produto.unidade || 'kg');
       } else {
         // Produtos unitários
         listaPesosContainer.style.display = 'none';
+        if (listaPesosScroll) listaPesosScroll.style.display = 'none';
         btnAddCaixa.style.display = 'none';
         if (camposUnitarioContainer) camposUnitarioContainer.style.display = 'block';
         if (tipoCaixaBox) tipoCaixaBox.style.display = 'none';
@@ -1332,15 +1362,10 @@
       const resumoDiv = document.getElementById('modalResumoTexto');
       const taraResumo = document.getElementById('modalTaraResumo');
 
-      resumoDiv.textContent = `Líquido: ${formatarNumero(totais.pesoLiquido)} ${unidade} | ${totais.totalCaixas} caixa(s)`;
+      resumoDiv.textContent = `${totais.totalCaixas} caixa(s) | Bruto: ${formatarNumero(totais.pesoBruto)} ${unidade} | Líquido: ${formatarNumero(totais.pesoLiquido)} ${unidade}`;
 
       if (taraResumo) {
-        taraResumo.innerHTML = `
-          Bruto: <strong>${formatarNumero(totais.pesoBruto)} ${unidade}</strong><br>
-          Tara: <strong>${formatarNumero(totais.taraTotal)} kg</strong>
-          (${totais.totalCaixas} × ${formatarNumero(totais.taraUnitaria)} kg)<br>
-          Líquido para lançamento: <strong>${formatarNumero(totais.pesoLiquido)} ${unidade}</strong>
-        `;
+        taraResumo.textContent = '';
       }
     }
 
@@ -1360,7 +1385,7 @@
       erro.textContent = mensagem;
       erro.classList.add('visivel');
     }
-    
+
     function confirmarPesagem() {
       if (modalIndexAtual === null) return;
 
@@ -1410,7 +1435,7 @@
           exibirErroModal('Informe o total de caixas/sacos e os itens por caixa.');
           return;
         }
-        
+
         produto.caixasTotais = caixasTotais > 0 ? caixasTotais : '';
         produto.itensPorCaixa = itensPorCaixa > 0 ? itensPorCaixa : '';
 
@@ -2265,12 +2290,7 @@
         <div id="modalTipoCaixaBox" class="modal-tara-box" style="display: none;">
           <label for="modalTipoCaixa">Tipo de caixa / tara</label>
           <select id="modalTipoCaixa"></select>
-          <p class="modal-tara-ajuda">
-            O conferente informa o peso bruto. O sistema desconta a tara e grava o peso líquido em Qtd/Peso.
-          </p>
-          <div id="modalTaraResumo" class="modal-tara-resumo">
-            Selecione o tipo de caixa para calcular o peso líquido.
-          </div>
+          <div id="modalTaraResumo" class="modal-tara-resumo" style="display: none;"></div>
         </div>
 
         <div class="modal-lista-scroll">
