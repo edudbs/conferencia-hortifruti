@@ -4,7 +4,7 @@
 
 Registro simples das principais alterações do projeto.
 
-## v0.9.8
+## v0.1.0
 
 * Preparação do projeto para hospedagem no Cloudflare Pages.
 * Separação lógica entre frontend e backend.
