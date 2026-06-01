@@ -25,6 +25,10 @@ function doGet(e) {
       return responder_(getTiposCaixa(), e);
     }
 
+    if (action === 'consultarPdfLancamento') {
+      return consultarPdfLancamento_(e);
+    }
+
     return responder_({
       sucesso: true,
       mensagem: 'API Conferência Hortifruti ativa.',
@@ -37,30 +41,43 @@ function doGet(e) {
 }
 
 function doPost(e) {
+  let action = '';
+
   try {
-    const action = e && e.parameter ? e.parameter.action : '';
+    action = e && e.parameter ? e.parameter.action : '';
 
-    if (action !== 'salvarConferencia') {
-      throw new Error('Ação POST inválida.');
+    Logger.log('ACTION RECEBIDA: ' + action);
+    Logger.log('PARAMETROS: ' + JSON.stringify(e.parameter));
+
+    if (action === 'salvarPdfLancamento') {
+      return salvarPdfLancamento_(e);
     }
 
-    const payloadTexto =
-      e.parameter && e.parameter.payload
-        ? e.parameter.payload
-        : e.postData && e.postData.contents
-          ? e.postData.contents
-          : '';
+    if (action === 'salvarConferencia') {
+      const payloadTexto =
+        e.parameter && e.parameter.payload
+          ? e.parameter.payload
+          : e.postData && e.postData.contents
+            ? e.postData.contents
+            : '';
 
-    if (!payloadTexto) {
-      throw new Error('Payload não informado.');
+      if (!payloadTexto) {
+        throw new Error('Payload não informado.');
+      }
+
+      const payload = JSON.parse(payloadTexto);
+      const resposta = salvarConferencia(payload);
+
+      return responder_(resposta, e);
     }
 
-    const payload = JSON.parse(payloadTexto);
-    const resposta = salvarConferencia(payload);
-
-    return responder_(resposta, e);
+    throw new Error('Ação POST inválida: ' + action);
 
   } catch (erro) {
+    if (action === 'salvarPdfLancamento') {
+      return responderErroIframeDrive_(erro);
+    }
+
     return responderErro_(erro, e);
   }
 }

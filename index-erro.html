@@ -10,7 +10,7 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 
-  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=4CWYOyJch26fI7dJ14FJO9uuY8p2njQD87gePrBypKY0fUYd8qK3kq_gHWAJhcjbNO0KicA1Ip3bUGmwCWc1hImW47cqc993EmYLZ7dphOUeJ4xPINrL0qDgVEb7OHh43AmUPwpNzF2F0ebnnqNs2gwuBtuesiWuMT7xTwwpUPLosU25LEPRo32laQzLUAiPR4kVHhbfpvdSR2NnFPRUa96UiufjVznoPnhTAzOMJjjARp-7YJVwXEmsebyzBcLzisbbzanqAEYtBnWnKT8NoPoIFIYsRk-Se3wtSCli_LL9hSufPjvHLyNVSTBCPb2GE6Yh8CI4mw8hVe11JrtoXA" charset="UTF-8"></script><style>
+  <style>
     :root {
       --bg: #ffffff;
       --app-bg: #f4f7f5;
@@ -3561,34 +3561,6 @@
     }
 
     function prepararIframeDrive() {
-  if (document.getElementById('iframeDrive')) return;
-
-  const iframe = document.createElement('iframe');
-
-  iframe.name = 'iframeDrive';
-  iframe.id = 'iframeDrive';
-  iframe.style.display = 'none';
-
-  document.body.appendChild(iframe);
-}
-
-          if (!status) return;
-
-          if (dados.sucesso && dados.url) {
-            status.className = 'status-relatorio-drive sucesso';
-            status.innerHTML =
-              'PDF salvo no Drive com sucesso.<br>' +
-              '<a href="' + dados.url + '" target="_blank" rel="noopener noreferrer">Abrir PDF</a>';
-          } else {
-            status.className = 'status-relatorio-drive erro';
-            status.textContent =
-              'Erro ao salvar PDF no Drive: ' + (dados.erro || 'erro desconhecido.');
-          }
-        });
-
-        window.listenerDriveConfigurado = true;
-      }
-
       if (document.getElementById('iframeDrive')) return;
 
       const iframe = document.createElement('iframe');

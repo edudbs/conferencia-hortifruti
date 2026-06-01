@@ -3,7 +3,7 @@
  * Crie uma pasta no Drive para os PDFs de lançamento e cole o ID aqui.
  * O ID é o trecho da URL entre /folders/ e o próximo ? ou fim da URL.
  */
-const ID_PASTA_RELATORIOS_LANCAMENTO = 'COLE_AQUI_O_ID_DA_PASTA_DE_LANCAMENTOS';
+const ID_PASTA_RELATORIOS_LANCAMENTO = '1HgzsaeujZyoxP_AyeN8mCf_uF9hmiCRG';
 
 /**
  * Integre este trecho ao seu doPost(e) atual.
@@ -48,14 +48,22 @@ function salvarPdfLancamento_(e) {
   const pasta = DriveApp.getFolderById(ID_PASTA_RELATORIOS_LANCAMENTO);
   const arquivo = pasta.createFile(blob);
 
-  return ContentService
-    .createTextOutput(JSON.stringify({
-      sucesso: true,
-      nomeArquivo: arquivo.getName(),
-      fileId: arquivo.getId(),
-      url: arquivo.getUrl()
-    }))
-    .setMimeType(ContentService.MimeType.JSON);
+  const resultado = {
+  sucesso: true,
+  nomeArquivo: arquivo.getName(),
+  fileId: arquivo.getId(),
+  url: arquivo.getUrl()
+};
+
+const requestId = e.parameter.requestId || '';
+
+if (requestId) {
+  CacheService
+    .getScriptCache()
+    .put('pdf_lancamento_' + requestId, JSON.stringify(resultado), 600);
+}
+
+return responderIframeDrive_(resultado);
 }
 
 function montarHtmlPdfLancamento_(payload) {
@@ -179,4 +187,65 @@ function escaparHtml_(valor) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+
+function responderIframeDrive_(dados) {
+  const json = JSON.stringify(dados).replace(/</g, '\\u003c');
+
+  const html = `
+<!DOCTYPE html>
+<html>
+  <body>
+    <script>
+      (function () {
+        var dados = ${json};
+
+        try {
+          window.parent.postMessage(dados, '*');
+        } catch (e) {}
+
+        try {
+          window.top.postMessage(dados, '*');
+        } catch (e) {}
+      })();
+    </script>
+  </body>
+</html>`;
+
+  return ContentService
+    .createTextOutput(html)
+    .setMimeType(ContentService.MimeType.HTML);
+}
+
+function responderErroIframeDrive_(erro) {
+  return responderIframeDrive_({
+    sucesso: false,
+    erro: erro && erro.message ? erro.message : String(erro)
+  });
+}
+
+
+function consultarPdfLancamento_(e) {
+  const requestId = e.parameter.requestId || '';
+
+  if (!requestId) {
+    return responder_({
+      sucesso: false,
+      erro: 'requestId não informado.'
+    }, e);
+  }
+
+  const valor = CacheService
+    .getScriptCache()
+    .get('pdf_lancamento_' + requestId);
+
+  if (!valor) {
+    return responder_({
+      sucesso: false,
+      pendente: true
+    }, e);
+  }
+
+  return responder_(JSON.parse(valor), e);
 }
