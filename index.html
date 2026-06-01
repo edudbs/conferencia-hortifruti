@@ -3893,6 +3893,16 @@
       )
         .then(res => res.json())
         .then(dados => {
+          console.log('Resposta consultarPdfDrive:', dados);
+
+          if (dados && dados.ok === true && dados.data) {
+            dados = dados.data;
+          }
+
+          if (dados && dados.sucesso === true && dados.data) {
+            dados = dados.data;
+          }
+
           if (dados.pendente) {
             setTimeout(() => {
               consultarPdfDrive(requestId, tentativa + 1);
