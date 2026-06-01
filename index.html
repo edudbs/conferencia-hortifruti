@@ -10,7 +10,7 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 
-  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=YTn_VlzE8Ap-uSDK4DjOSZWi6f_yyXJpq7tcr3xZtyCJFFFM3ymBxpy2t_IAKcZOjleEz_ghte2zsRPKM13rRRALY9SGsTP6Cfyjo2uKYaxXq7UAezNmYNvfvrYQ60nA7q9_bOFF2N_k9T0YyMkRJUQhPIyIyfV74IOWp2ifCRrq1RB-B3X76404lQKXG2fazCl6oN-_yczF-QPcfqk02YUlgCYwE-VwmPiSX_Mnfzg66QvzZQ-wQGlDAYS1vLySMYqkip40KZgMIxRO3MxjDqSKQPp4BoBxoFFR313thCcd6zoQWb9SnhEckkzDfxV9CU6FYjAlRH6MwJT4-RMHdQ" charset="UTF-8"></script><style>
+  <style>
     :root {
       --bg: #ffffff;
       --app-bg: #f4f7f5;
@@ -1135,6 +1135,8 @@
       const input = document.createElement('input');
       input.type = 'number';
       input.className = 'peso-input';
+      input.inputMode = 'decimal';
+      input.enterKeyHint = 'next';
       input.step = '0.001';
       input.min = '0';
       input.placeholder = '0.000';
@@ -1145,7 +1147,15 @@
       });
 
       input.addEventListener('keydown', (event) => {
-        tratarTeclasModal(event, index, unidade);
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          event.stopPropagation();
+          tratarTeclasModal(event, index, unidade);
+        }
+      });
+
+      input.addEventListener('focus', () => {
+        input.select();
       });
 
       const badge = document.createElement('span');
@@ -1375,7 +1385,7 @@
       erro.textContent = mensagem;
       erro.classList.add('visivel');
     }
-    
+
     function confirmarPesagem() {
       if (modalIndexAtual === null) return;
 
@@ -1425,7 +1435,7 @@
           exibirErroModal('Informe o total de caixas/sacos e os itens por caixa.');
           return;
         }
-        
+
         produto.caixasTotais = caixasTotais > 0 ? caixasTotais : '';
         produto.itensPorCaixa = itensPorCaixa > 0 ? itensPorCaixa : '';
 
