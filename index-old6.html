@@ -846,792 +846,6 @@
     .btn-principal:hover {
       background: var(--primary-dark);
     }
-
-    /* Relatório / Impressão PDF */
-    .relatorio-card {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 10px;
-      border: 1px solid var(--border);
-    }
-
-    .relatorio-acoes {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .relatorio-documento {
-      background: #ffffff;
-      color: #111827;
-      padding: 16px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .relatorio-topo {
-      text-align: center;
-      border-bottom: 2px solid #111827;
-      padding-bottom: 10px;
-      margin-bottom: 12px;
-    }
-
-    .relatorio-topo h1 {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: 0.02em;
-      color: #111827;
-    }
-
-    .relatorio-topo p {
-      margin: 4px 0 0;
-      color: #374151;
-      font-size: 12px;
-    }
-
-    .relatorio-meta {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-
-    .relatorio-meta-item {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 7px 8px;
-      background: #f9fafb;
-    }
-
-    .relatorio-meta-label {
-      display: block;
-      font-size: 10px;
-      color: #6b7280;
-      text-transform: uppercase;
-      font-weight: bold;
-      margin-bottom: 2px;
-    }
-
-    .relatorio-tabela-wrap {
-      width: 100%;
-      overflow-x: auto;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-    }
-
-    .relatorio-tabela {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 520px;
-      font-size: 12px;
-    }
-
-    .relatorio-tabela th,
-    .relatorio-tabela td {
-      border: 1px solid #d1d5db;
-      padding: 6px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    .relatorio-tabela th {
-      background: #f3f4f6;
-      color: #111827;
-      font-weight: bold;
-      white-space: nowrap;
-      text-align: center;
-    }
-
-    .relatorio-produto {
-      font-weight: bold;
-    }
-
-    .relatorio-codigo {
-      margin-top: 2px;
-      font-size: 10.5px;
-      color: #6b7280;
-      font-weight: normal;
-    }
-
-    .relatorio-col-numero,
-    .relatorio-col-caixas {
-      text-align: center !important;
-      vertical-align: middle !important;
-    }
-
-    .relatorio-assinatura {
-      margin-top: 26px;
-      text-align: center;
-      page-break-inside: avoid;
-    }
-
-    .relatorio-linha-assinatura {
-      width: 260px;
-      max-width: 80%;
-      border-top: 1px solid #111827;
-      margin: 38px auto 6px;
-    }
-
-    @media print {
-      @page {
-        size: A4 portrait;
-        margin: 12mm;
-      }
-
-      html,
-      body {
-        width: auto;
-        min-height: auto;
-        margin: 0;
-        padding: 0;
-        overflow: visible !important;
-        background: #ffffff !important;
-        color: #000000 !important;
-        font-size: 11px;
-      }
-
-      body * {
-        visibility: hidden !important;
-      }
-
-      #relatorioImpressao,
-      #relatorioImpressao * {
-        visibility: visible !important;
-      }
-
-      #relatorioImpressao {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        border: none;
-        border-radius: 0;
-        font-size: 10.5px;
-        line-height: 1.25;
-      }
-
-      .container {
-        width: 100%;
-        max-width: none;
-        min-height: auto;
-        padding: 0;
-        margin: 0;
-        background: #ffffff !important;
-      }
-
-      .no-print,
-      .relatorio-acoes,
-      button {
-        display: none !important;
-      }
-
-      .relatorio-documento {
-        padding: 0;
-        border: none;
-        border-radius: 0;
-      }
-
-      .relatorio-topo h1 {
-        font-size: 16px;
-      }
-
-      .relatorio-meta {
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 5px;
-      }
-
-      .relatorio-meta-item {
-        padding: 5px;
-        border-radius: 0;
-        background: #ffffff;
-      }
-
-      .relatorio-tabela-wrap {
-        overflow: visible;
-        border: none;
-        border-radius: 0;
-      }
-
-      .relatorio-tabela {
-        min-width: 0;
-        font-size: 9.5px;
-      }
-
-      .relatorio-tabela th,
-      .relatorio-tabela td {
-        padding: 4px;
-      }
-    }
-
-
-    .relatorio-tabela th:not(:first-child),
-    .relatorio-tabela td:not(:first-child) {
-      text-align: center;
-    }
-
-    .relatorio-tabela th:first-child,
-    .relatorio-tabela td:first-child {
-      text-align: left;
-    }
-
-
-    .relatorio-tabela th,
-    .relatorio-tabela td {
-      vertical-align: middle;
-    }
-
-    .relatorio-tabela th:first-child,
-    .relatorio-tabela td:first-child,
-    .relatorio-produto,
-    .relatorio-produto-nome,
-    .relatorio-produto-codigo {
-      text-align: left !important;
-    }
-
-    .relatorio-tabela th:not(:first-child),
-    .relatorio-tabela td:not(:first-child) {
-      text-align: center !important;
-    }
-
-
-    /* Relatório operacional de lançamento */
-    .relatorio-tabela {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .relatorio-tabela th,
-    .relatorio-tabela td {
-      vertical-align: middle !important;
-    }
-
-    .relatorio-tabela th {
-      text-align: center !important;
-    }
-
-    .relatorio-tabela th:first-child,
-    .relatorio-tabela td:first-child,
-    .relatorio-produto,
-    .relatorio-produto-nome,
-    .relatorio-produto-codigo {
-      text-align: left !important;
-    }
-
-    .relatorio-tabela td:not(:first-child) {
-      text-align: center !important;
-    }
-
-    .relatorio-produto-nome {
-      font-weight: bold;
-    }
-
-    .relatorio-produto-codigo {
-      font-size: 11px;
-      color: #6b7280;
-      margin-top: 2px;
-      font-weight: normal;
-    }
-
-
-    .relatorio-col-observacao {
-      text-align: center !important;
-      vertical-align: middle !important;
-    }
-
-    .relatorio-produto,
-    .relatorio-produto-nome,
-    .relatorio-produto-codigo {
-      text-align: left !important;
-      vertical-align: middle !important;
-    }
-
-
-    .review-header div {
-      text-align: center !important;
-    }
-
-    #usuario {
-      text-transform: uppercase;
-    }
-
-    .peso-row.pesagem-row {
-      display: grid;
-      grid-template-columns: 68px 76px minmax(0, 1fr) 38px;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .pesagem-campo label {
-      display: block;
-      margin-bottom: 3px;
-      font-size: 11px;
-      color: var(--muted);
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .pesagem-campo input {
-      width: 100%;
-      padding: 8px 6px;
-      font-size: 16px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .pesagem-peso-wrapper {
-      position: relative;
-    }
-
-    .pesagem-peso-wrapper input {
-      padding-right: 34px;
-    }
-
-    .pesagem-peso-wrapper .peso-unit-badge {
-      right: 8px;
-      font-size: 10px;
-    }
-
-    @media (max-width: 390px) {
-      .peso-row.pesagem-row {
-        grid-template-columns: 62px 68px minmax(0, 1fr) 36px;
-        gap: 5px;
-      }
-
-      .pesagem-campo input {
-        font-size: 15px;
-        padding: 8px 4px;
-      }
-    }
-
-
-    /* Ajustes finos do relatório operacional */
-    .relatorio-tabela {
-      table-layout: fixed;
-      width: 100%;
-    }
-
-    .relatorio-tabela th:nth-child(1) {
-      width: 42%;
-      text-align: center !important;
-    }
-
-    .relatorio-tabela td:nth-child(1) {
-      width: 42%;
-      text-align: left !important;
-    }
-
-    .relatorio-tabela th:nth-child(2),
-    .relatorio-tabela td:nth-child(2) {
-      width: 11%;
-    }
-
-    .relatorio-tabela th:nth-child(3),
-    .relatorio-tabela td:nth-child(3) {
-      width: 21%;
-    }
-
-    .relatorio-tabela th:nth-child(4),
-    .relatorio-tabela td:nth-child(4) {
-      width: 26%;
-    }
-
-    .relatorio-tabela td:nth-child(4) {
-      padding-left: 8px;
-      padding-right: 8px;
-    }
-
-    .relatorio-produto {
-      padding-right: 10px;
-    }
-
-    .relatorio-produto-nome {
-      word-break: break-word;
-      line-height: 1.2;
-    }
-
-    .relatorio-produto-codigo {
-      margin-top: 3px;
-    }
-
-
-    .modal-alerta-pergunta {
-      margin: -4px 0 12px;
-      color: var(--danger);
-      font-size: 15px;
-      font-weight: bold;
-      line-height: 1.35;
-    }
-
-
-    /* Ajustes de espaçamento da tela de revisão */
-    #telaRevisao .card>p {
-      padding-left: 6px;
-      padding-right: 6px;
-    }
-
-    #telaRevisao .review-row>div:first-child {
-      padding-left: 8px;
-      padding-right: 6px;
-    }
-
-    #telaRevisao .review-produto,
-    #telaRevisao .review-unidade {
-      padding-left: 0;
-    }
-
-    #telaRevisao .review-observacao {
-      margin-left: 8px;
-      margin-right: 8px;
-    }
-
-
-    /* Ajustes finos do modal de lançamento por peso */
-    #modalTipoCaixaBox label {
-      padding-left: 2px;
-      margin-bottom: 6px;
-      text-align: left;
-    }
-
-    #modalTipoCaixa {
-      display: block;
-      width: 100%;
-    }
-
-    .modal-tara-box {
-      margin-bottom: 8px;
-      padding-bottom: 8px;
-    }
-
-    .modal-body {
-      padding-top: 12px;
-      padding-bottom: 10px;
-    }
-
-    .modal-lista-scroll {
-      max-height: 42vh;
-      min-height: 112px;
-    }
-
-    .peso-row.pesagem-row {
-      grid-template-columns: 72px 64px minmax(0, 118px) 36px;
-      align-items: center !important;
-      margin-bottom: 6px;
-    }
-
-    .peso-row.pesagem-row .peso-label {
-      align-self: center;
-      display: flex;
-      align-items: center;
-      min-height: 62px;
-      line-height: 1.15;
-    }
-
-    .pesagem-campo label {
-      margin-bottom: 2px;
-      line-height: 1.1;
-    }
-
-    .pesagem-campo input {
-      padding-top: 7px;
-      padding-bottom: 7px;
-    }
-
-    .pesagem-peso-wrapper input {
-      padding-right: 30px;
-    }
-
-    .modal-add-fixo {
-      padding-top: 6px;
-    }
-
-    .btn-add-caixa {
-      padding: 10px;
-    }
-
-    .modal-observacao-box {
-      margin-top: 8px;
-      padding-top: 8px;
-    }
-
-    .modal-footer {
-      padding-top: 10px;
-      padding-bottom: 12px;
-    }
-
-    .modal-resumo {
-      margin-bottom: 8px;
-      padding: 7px;
-    }
-
-    @media (max-width: 390px) {
-      .peso-row.pesagem-row {
-        grid-template-columns: 66px 58px minmax(0, 108px) 34px;
-      }
-
-      .peso-row.pesagem-row .peso-label {
-        min-height: 58px;
-      }
-
-      .modal-lista-scroll {
-        max-height: 40vh;
-      }
-    }
-
-
-    .modal-product-subtitle {
-      margin-top: 8px;
-      padding-top: 8px;
-    }
-
-
-    /* Modal de pesagem mais compacto para celular */
-    #modalPesagem .modal-content {
-      max-height: calc(100dvh - env(safe-area-inset-top) - 28px);
-    }
-
-    #modalPesagem .modal-header {
-      padding-top: 8px !important;
-      padding-bottom: 8px !important;
-    }
-
-    #modalPesagem .modal-close {
-      top: 8px !important;
-    }
-
-    #modalPesagem .modal-product-subtitle {
-      margin-top: 0;
-      padding-top: 0;
-      border-top: none;
-      padding-right: 34px;
-      font-size: 16px;
-      line-height: 1.2;
-    }
-
-    #modalPesagem .modal-body {
-      padding: 10px 12px 8px;
-    }
-
-    #modalPesagem .modal-tara-box {
-      margin-bottom: 6px;
-      padding-bottom: 6px;
-    }
-
-    #modalPesagem #modalTipoCaixaBox label {
-      font-size: 13px;
-      margin-bottom: 4px;
-    }
-
-    #modalPesagem #modalTipoCaixa {
-      padding: 8px;
-      font-size: 15px;
-    }
-
-    #modalPesagem .modal-lista-scroll {
-      max-height: 46vh;
-      min-height: 145px;
-    }
-
-    #modalPesagem .peso-row.pesagem-row {
-      grid-template-columns: 64px 54px minmax(0, 96px) 32px;
-      gap: 5px;
-      margin-bottom: 5px;
-    }
-
-    #modalPesagem .peso-row.pesagem-row .peso-label {
-      min-height: 54px;
-      align-items: center;
-      font-size: 11px;
-    }
-
-    #modalPesagem .pesagem-campo label {
-      font-size: 10px;
-    }
-
-    #modalPesagem .pesagem-campo input {
-      padding: 7px 4px;
-      font-size: 15px;
-    }
-
-    #modalPesagem .pesagem-peso-wrapper input {
-      padding-right: 26px;
-    }
-
-    #modalPesagem .pesagem-peso-wrapper .peso-unit-badge {
-      right: 6px;
-      font-size: 9px;
-    }
-
-    #modalPesagem .btn-remover-peso {
-      width: 32px;
-      height: 34px;
-      font-size: 12px;
-    }
-
-    #modalPesagem .modal-add-fixo {
-      padding-top: 5px;
-    }
-
-    #modalPesagem .btn-add-caixa {
-      padding: 8px;
-      font-size: 13px;
-    }
-
-    .btn-observacao-toggle {
-      width: 100%;
-      margin-top: 7px;
-      padding: 8px;
-      border: 1px dashed var(--border);
-      border-radius: 8px;
-      background: #f9fafb;
-      color: #374151;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    #modalPesagem .modal-observacao-box {
-      display: none;
-      margin-top: 7px;
-      padding-top: 7px;
-    }
-
-    #modalPesagem .modal-observacao-box label {
-      font-size: 13px;
-      margin-bottom: 4px;
-    }
-
-    #modalPesagem #modalObservacaoProduto {
-      padding: 8px;
-      font-size: 15px;
-    }
-
-    #modalPesagem .modal-observacao-ajuda {
-      display: none;
-    }
-
-    #modalPesagem .modal-footer {
-      padding: 8px 12px 10px;
-    }
-
-    #modalPesagem .modal-resumo {
-      margin-bottom: 6px;
-      padding: 6px;
-      font-size: 13px;
-      line-height: 1.2;
-    }
-
-    #modalPesagem .modal-botoes {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-
-    #modalPesagem .modal-botoes button {
-      padding: 9px 7px;
-      font-size: 13px;
-      margin: 0;
-    }
-
-    #modalPesagem .btn-limpar {
-      grid-column: 1 / 2;
-      flex-basis: auto;
-    }
-
-    #modalPesagem .btn-cancelar {
-      grid-column: 2 / 3;
-    }
-
-    #modalPesagem .btn-salvar {
-      grid-column: 1 / -1;
-      padding: 10px 8px !important;
-      font-size: 15px !important;
-    }
-
-    @media (max-width: 390px) {
-      #modalPesagem .modal-lista-scroll {
-        max-height: 44vh;
-        min-height: 132px;
-      }
-
-      #modalPesagem .peso-row.pesagem-row {
-        grid-template-columns: 58px 50px minmax(0, 88px) 30px;
-        gap: 4px;
-      }
-
-      #modalPesagem .peso-row.pesagem-row .peso-label {
-        min-height: 52px;
-      }
-    }
-
-
-    /* Centralização vertical refinada das linhas de pesagem */
-    #modalPesagem .peso-row.pesagem-row {
-      align-items: center !important;
-    }
-
-    #modalPesagem .peso-row.pesagem-row .peso-label {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: flex-start;
-      align-self: stretch;
-      min-height: 100%;
-      padding-top: 14px;
-      line-height: 1.1;
-    }
-
-    #modalPesagem .btn-remover-peso {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      align-self: center !important;
-      margin-top: 14px;
-    }
-
-    @media (max-width: 390px) {
-      #modalPesagem .peso-row.pesagem-row .peso-label {
-        padding-top: 13px;
-      }
-
-      #modalPesagem .btn-remover-peso {
-        margin-top: 13px;
-      }
-    }
-
-
-    #modalPesagem .modal-observacao-erro.visivel {
-      display: block !important;
-      margin-top: 6px;
-      margin-bottom: 6px;
-      padding: 8px;
-      font-size: 13px;
-      text-align: center;
-    }
-
-
-    #modalPesagem .modal-erro-pesagem {
-      display: none;
-      margin-bottom: 6px;
-      padding: 8px;
-      border-radius: 8px;
-      background: #fee2e2;
-      color: var(--danger);
-      font-size: 13px;
-      font-weight: bold;
-      text-align: center;
-      line-height: 1.25;
-    }
-
-    #modalPesagem .modal-erro-pesagem.visivel {
-      display: block;
-    }
   </style>
 </head>
 
@@ -1654,7 +868,7 @@
 
         <div class="field">
           <label for="usuario">Conferente</label>
-          <input type="text" id="usuario" placeholder="Nome" autocapitalize="characters">
+          <input type="text" id="usuario" placeholder="Nome">
         </div>
 
         <div class="field">
@@ -1681,7 +895,6 @@
 
     <div id="telaRevisao" style="display: none;"></div>
     <div id="telaSucesso" style="display: none;"></div>
-    <div id="telaRelatorio" style="display: none;"></div>
 
   </div>
 
@@ -1755,7 +968,6 @@
     let produtos = [];
     let tiposCaixa = [];
     let ultimoPayload = null;
-    let ultimaRespostaConferencia = null;
     let envioEmAndamento = false;
     let modalIndexAtual = null;
 
@@ -1833,43 +1045,20 @@
     }
 
     function calcularTotaisPesoModal() {
-      const linhas = document.querySelectorAll('.pesagem-row');
-      const pesagensKg = [];
-      const pesagensIncompletas = [];
+      const inputs = document.querySelectorAll('.peso-input');
+      const pesos = [];
       let totalCaixas = 0;
       let pesoBruto = 0;
 
-      linhas.forEach((linha, index) => {
-        const inputCaixas = linha.querySelector('.pesagem-caixas-input');
-        const inputPeso = linha.querySelector('.pesagem-peso-input');
-
-        const caixasTexto = inputCaixas && inputCaixas.value ? inputCaixas.value.trim() : '';
-        const pesoTexto = inputPeso && inputPeso.value ? inputPeso.value.trim() : '';
-
-        const caixas = parseInt(caixasTexto) || 0;
-        const peso = normalizarNumero(pesoTexto);
-
-        const temCaixas = caixas > 0;
-        const temPeso = peso > 0;
-
-        if (temCaixas !== temPeso) {
-          pesagensIncompletas.push({
-            numero: index + 1,
-            caixas,
-            pesoBruto: peso
-          });
-        }
-
-        if (temCaixas || temPeso) {
-          pesagensKg.push({
-            caixas,
-            pesoBruto: peso
-          });
-        }
-
-        if (temCaixas && temPeso) {
-          totalCaixas += caixas;
-          pesoBruto += peso;
+      inputs.forEach(input => {
+        const valStr = input.value.trim();
+        if (valStr !== '') {
+          const val = Number(valStr.replace(',', '.')) || 0;
+          pesos.push(val);
+          if (val > 0) {
+            totalCaixas++;
+            pesoBruto += val;
+          }
         }
       });
 
@@ -1878,22 +1067,8 @@
       const taraTotal = totalCaixas * taraUnitaria;
       const pesoLiquido = Math.max(0, pesoBruto - taraTotal);
 
-      const pesos = [];
-      pesagensKg.forEach(pesagem => {
-        const caixas = Number(pesagem.caixas || 0);
-        const peso = Number(pesagem.pesoBruto || 0);
-        if (caixas > 0 && peso > 0) {
-          const media = Number((peso / caixas).toFixed(3));
-          for (let i = 0; i < caixas; i++) {
-            pesos.push(media);
-          }
-        }
-      });
-
       return {
         pesos,
-        pesagensKg,
-        pesagensIncompletas,
         totalCaixas,
         pesoBruto,
         tipoCaixa: tipoCaixa.tipoCaixa || 'Sem desconto',
@@ -1923,7 +1098,6 @@
       const label = document.getElementById('modalObservacaoLabel');
       const ajuda = document.getElementById('modalObservacaoAjuda');
       const erro = document.getElementById('modalObservacaoErro');
-      limparErroPesagemModal();
 
       if (!campo || !label || !ajuda || !erro) return;
 
@@ -1933,58 +1107,20 @@
       erro.classList.remove('visivel');
       erro.textContent = '';
 
-      const box = document.getElementById('modalObservacaoBox');
-      const btnToggle = document.getElementById('btnToggleObservacao');
-      const temObservacao = Boolean(campo.value.trim());
-
       if (isOutro) {
         label.textContent = 'Descrição do produto *';
         campo.placeholder = 'Ex: jiló, abacaxi pequeno, couve-flor...';
         ajuda.textContent = 'Obrigatório para OUTRO/OUTROS. Informe qual produto foi conferido.';
-        if (box) box.style.display = 'block';
-        if (btnToggle) btnToggle.style.display = 'none';
       } else {
         label.textContent = 'Observação (opcional)';
         campo.placeholder = 'Ex: caixa avariada, produto maduro, peso estimado...';
         ajuda.textContent = 'Use apenas se houver alguma informação importante sobre este lançamento.';
-        if (box) box.style.display = temObservacao ? 'block' : 'none';
-        if (btnToggle) {
-          btnToggle.style.display = 'block';
-          btnToggle.textContent = temObservacao ? 'Editar observação' : '+ Observação';
-        }
-      }
-    }
-
-    function alternarObservacaoModal(forcarAbrir) {
-      const box = document.getElementById('modalObservacaoBox');
-      const btn = document.getElementById('btnToggleObservacao');
-      const campo = document.getElementById('modalObservacaoProduto');
-
-      if (!box) return;
-
-      const deveAbrir =
-        typeof forcarAbrir === 'boolean'
-          ? forcarAbrir
-          : box.style.display === 'none';
-
-      box.style.display = deveAbrir ? 'block' : 'none';
-
-      if (btn) {
-        const temTexto = campo && campo.value.trim();
-        btn.textContent = deveAbrir
-          ? 'Ocultar observação'
-          : (temTexto ? 'Editar observação' : '+ Observação');
-      }
-
-      if (deveAbrir && campo) {
-        setTimeout(() => campo.focus(), 0);
       }
     }
 
     function validarObservacaoModal(produto) {
       const campo = document.getElementById('modalObservacaoProduto');
       const erro = document.getElementById('modalObservacaoErro');
-      limparErroPesagemModal();
 
       if (!campo) return true;
 
@@ -1992,7 +1128,6 @@
       const isOutro = produtoEhOutro(produto);
 
       if (isOutro && !texto) {
-        alternarObservacaoModal(true);
         if (erro) {
           erro.textContent = 'Informe a descrição do produto para OUTRO/OUTROS.';
           erro.classList.add('visivel');
@@ -2083,87 +1218,46 @@
       }
     }
 
-    function criarLinhaPesoModal(pesagem, index, unidade) {
-      const dados = typeof pesagem === 'object' && pesagem !== null
-        ? pesagem
-        : {
-          caixas: pesagem ? 1 : '',
-          pesoBruto: pesagem || ''
-        };
-
+    function criarLinhaPesoModal(peso, index, unidade) {
       const row = document.createElement('div');
-      row.className = 'peso-row pesagem-row';
+      row.className = 'peso-row';
       row.id = `pesoRow_${index}`;
 
       const label = document.createElement('div');
       label.className = 'peso-label';
-      label.textContent = `Pesagem ${index + 1}`;
+      label.textContent = `Caixa ${index + 1}`;
 
-      const campoCaixas = document.createElement('div');
-      campoCaixas.className = 'pesagem-campo';
+      const wrapper = document.createElement('div');
+      wrapper.className = 'peso-input-wrapper';
 
-      const labelCaixas = document.createElement('label');
-      labelCaixas.textContent = 'Cxs';
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.className = 'peso-input';
+      input.step = '0.001';
+      input.inputMode = 'decimal';
+      input.enterKeyHint = 'next';
+      input.min = '0';
+      input.placeholder = '0.000';
+      input.value = peso ?? '';
 
-      const inputCaixas = document.createElement('input');
-      inputCaixas.type = 'number';
-      inputCaixas.className = 'pesagem-caixas-input';
-      inputCaixas.step = '1';
-      inputCaixas.inputMode = 'numeric';
-      inputCaixas.enterKeyHint = 'next';
-      inputCaixas.min = '0';
-      inputCaixas.placeholder = '0';
-      inputCaixas.value = dados.caixas ?? '';
-
-      campoCaixas.appendChild(labelCaixas);
-      campoCaixas.appendChild(inputCaixas);
-
-      const campoPeso = document.createElement('div');
-      campoPeso.className = 'pesagem-campo';
-
-      const labelPeso = document.createElement('label');
-      labelPeso.textContent = 'Peso total';
-
-      const wrapperPeso = document.createElement('div');
-      wrapperPeso.className = 'pesagem-peso-wrapper';
-
-      const inputPeso = document.createElement('input');
-      inputPeso.type = 'number';
-      inputPeso.className = 'pesagem-peso-input peso-input';
-      inputPeso.step = '0.001';
-      inputPeso.inputMode = 'decimal';
-      inputPeso.enterKeyHint = 'next';
-      inputPeso.min = '0';
-      inputPeso.placeholder = '0.000';
-      inputPeso.value = dados.pesoBruto ?? '';
-
-      const badge = document.createElement('span');
-      badge.className = 'peso-unit-badge';
-      badge.textContent = unidade;
-
-      wrapperPeso.appendChild(inputPeso);
-      wrapperPeso.appendChild(badge);
-      campoPeso.appendChild(labelPeso);
-      campoPeso.appendChild(wrapperPeso);
-
-      inputCaixas.addEventListener('input', () => atualizarResumoModal(unidade));
-      inputPeso.addEventListener('input', () => atualizarResumoModal(unidade));
-
-      inputCaixas.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          inputPeso.focus();
-          inputPeso.select();
-        }
+      input.addEventListener('input', () => {
+        atualizarResumoModal(unidade);
       });
 
-      inputPeso.addEventListener('keydown', (event) => {
+      input.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
           event.preventDefault();
           event.stopPropagation();
           tratarTeclasModal(event, index, unidade);
         }
       });
+
+      const badge = document.createElement('span');
+      badge.className = 'peso-unit-badge';
+      badge.textContent = unidade;
+
+      wrapper.appendChild(input);
+      wrapper.appendChild(badge);
 
       const btnRemover = document.createElement('button');
       btnRemover.type = 'button';
@@ -2174,8 +1268,7 @@
       });
 
       row.appendChild(label);
-      row.appendChild(campoCaixas);
-      row.appendChild(campoPeso);
+      row.appendChild(wrapper);
       row.appendChild(btnRemover);
 
       return row;
@@ -2185,7 +1278,6 @@
     function abrirModalPesagem(index) {
       modalIndexAtual = index;
       const produto = produtos[index];
-      limparErroPesagemModal();
       const unidade = (produto.unidade || 'kg').trim().toLowerCase();
       const isKg = unidade === 'kg';
 
@@ -2193,11 +1285,9 @@
       const produtoSubtitulo = document.getElementById('modalProdutoSubtitulo');
 
       if (isKg) {
-        tituloTipo.textContent = "";
-        tituloTipo.style.display = "none";
+        tituloTipo.textContent = "Lançamento por Peso";
       } else {
         tituloTipo.textContent = "Lançamento de Itens Unitários";
-        tituloTipo.style.display = "block";
       }
 
       produtoSubtitulo.innerHTML = `
@@ -2237,26 +1327,20 @@
 
         configurarTipoCaixaModal(produto);
 
-        if (!produto.pesagensKg) {
-          produto.pesagensKg = (produto.pesosCaixas || []).map(peso => ({
-            caixas: peso ? 1 : '',
-            pesoBruto: peso || ''
-          }));
+        if (!produto.pesosCaixas) {
+          produto.pesosCaixas = [];
         }
 
-        const pesagens = [...produto.pesagensKg];
-        if (pesagens.length === 0) {
-          pesagens.push({
-            caixas: '',
-            pesoBruto: ''
-          });
+        const pesos = [...produto.pesosCaixas];
+        if (pesos.length === 0) {
+          pesos.push('');
         }
 
-        renderizarLinhasModal(pesagens, produto.unidade || 'kg');
+        renderizarLinhasModal(pesos, produto.unidade || 'kg');
 
         document.getElementById('modalPesagem').style.display = 'flex';
 
-        const primeiroInput = document.querySelector('.pesagem-caixas-input');
+        const primeiroInput = document.querySelector('.peso-input');
         if (primeiroInput) {
           setTimeout(() => {
             primeiroInput.focus();
@@ -2313,10 +1397,10 @@
       }
     }
 
-    function renderizarLinhasModal(pesagens, unidade) {
+    function renderizarLinhasModal(pesos, unidade) {
       const container = document.getElementById('modalListaPesos');
-      const linhas = pesagens.map((pesagem, index) =>
-        criarLinhaPesoModal(pesagem, index, unidade)
+      const linhas = pesos.map((peso, index) =>
+        criarLinhaPesoModal(peso, index, unidade)
       );
 
       container.replaceChildren(...linhas);
@@ -2325,31 +1409,24 @@
     function tratarTeclasModal(event, index, unidade) {
       if (event.key === 'Enter') {
         event.preventDefault();
-        const linhas = document.querySelectorAll('.pesagem-row');
-
-        if (index === linhas.length - 1) {
+        const inputs = document.querySelectorAll('.peso-input');
+        if (index === inputs.length - 1) {
           adicionarCaixaNoModal(unidade);
         } else {
-          const proxima = linhas[index + 1].querySelector('.pesagem-caixas-input');
-          if (proxima) {
-            proxima.focus();
-            proxima.select();
-          }
+          inputs[index + 1].focus();
+          inputs[index + 1].select();
         }
       }
     }
 
     function adicionarCaixaNoModal(unidade) {
       const container = document.getElementById('modalListaPesos');
-      const newIndex = container.querySelectorAll('.pesagem-row').length;
-      const novaLinha = criarLinhaPesoModal({
-        caixas: '',
-        pesoBruto: ''
-      }, newIndex, unidade);
+      const newIndex = container.querySelectorAll('.peso-row').length;
+      const novaLinha = criarLinhaPesoModal('', newIndex, unidade);
 
       container.appendChild(novaLinha);
 
-      const novoInput = novaLinha.querySelector('.pesagem-caixas-input');
+      const novoInput = novaLinha.querySelector('.peso-input');
       if (novoInput) {
         novoInput.focus();
       }
@@ -2358,46 +1435,35 @@
     }
 
     function removerCaixaNoModal(index, unidade) {
-      const linhas = document.querySelectorAll('.pesagem-row');
-      const pesagens = [];
-
-      linhas.forEach((linha, i) => {
+      const inputs = document.querySelectorAll('.peso-input');
+      const pesos = [];
+      inputs.forEach((input, i) => {
         if (i !== index) {
-          const inputCaixas = linha.querySelector('.pesagem-caixas-input');
-          const inputPeso = linha.querySelector('.pesagem-peso-input');
-
-          pesagens.push({
-            caixas: inputCaixas ? inputCaixas.value : '',
-            pesoBruto: inputPeso ? inputPeso.value : ''
-          });
+          pesos.push(input.value);
         }
       });
 
-      if (pesagens.length === 0) {
-        pesagens.push({
-          caixas: '',
-          pesoBruto: ''
-        });
+      if (pesos.length === 0) {
+        pesos.push('');
       }
 
-      renderizarLinhasModal(pesagens, unidade);
+      renderizarLinhasModal(pesos, unidade);
 
-      const novasLinhas = document.querySelectorAll('.pesagem-row');
-      if (novasLinhas.length > 0) {
-        const ultimoInput = novasLinhas[novasLinhas.length - 1].querySelector('.pesagem-caixas-input');
-        if (ultimoInput) ultimoInput.focus();
+      const novosInputs = document.querySelectorAll('.peso-input');
+      if (novosInputs.length > 0) {
+        novosInputs[novosInputs.length - 1].focus();
       }
 
       atualizarResumoModal(unidade);
+
     }
 
     function atualizarResumoModal(unidade) {
-      limparErroPesagemModal();
       const totais = calcularTotaisPesoModal();
       const resumoDiv = document.getElementById('modalResumoTexto');
       const taraResumo = document.getElementById('modalTaraResumo');
 
-      resumoDiv.textContent = `Cxs: ${totais.totalCaixas} | Bruto: ${formatarNumero(totais.pesoBruto)} | Líq: ${formatarNumero(totais.pesoLiquido)} ${unidade}`;
+      resumoDiv.textContent = `${totais.totalCaixas} caixa(s) | Bruto: ${formatarNumero(totais.pesoBruto)} ${unidade} | Líquido: ${formatarNumero(totais.pesoLiquido)} ${unidade}`;
 
       if (taraResumo) {
         taraResumo.textContent = '';
@@ -2405,31 +1471,12 @@
     }
 
     function fecharModalPesagem() {
-      limparErroPesagemModal();
       document.getElementById('modalPesagem').style.display = 'none';
       modalIndexAtual = null;
     }
 
-    function limparErroPesagemModal() {
-      const erroPesagem = document.getElementById('modalErroPesagem');
-
-      if (erroPesagem) {
-        erroPesagem.textContent = '';
-        erroPesagem.classList.remove('visivel');
-      }
-    }
-
     function exibirErroModal(mensagem) {
-      const erroPesagem = document.getElementById('modalErroPesagem');
-
-      if (erroPesagem) {
-        erroPesagem.textContent = mensagem;
-        erroPesagem.classList.add('visivel');
-        return;
-      }
-
       const erro = document.getElementById('modalObservacaoErro');
-      limparErroPesagemModal();
 
       if (!erro) {
         alert(mensagem);
@@ -2449,9 +1496,7 @@
       const inputQtdPeso = document.getElementById(`qtdpeso_${modalIndexAtual}`);
       const campoObservacao = document.getElementById('modalObservacaoProduto');
       const erro = document.getElementById('modalObservacaoErro');
-      limparErroPesagemModal();
 
-      produto.pesagensKg = [];
       produto.pesosCaixas = [];
       produto.caixasTotais = '';
       produto.itensPorCaixa = '';
@@ -2522,17 +1567,6 @@
       if (isKg) {
         const totais = calcularTotaisPesoModal();
 
-        if (totais.pesagensIncompletas && totais.pesagensIncompletas.length > 0) {
-          const numeros = totais.pesagensIncompletas
-            .map(item => item.numero)
-            .join(', ');
-
-          exibirErroModal(
-            'Complete a quantidade de caixas e o peso total da(s) pesagem(ns): ' + numeros + '.'
-          );
-          return;
-        }
-
         if (totais.totalCaixas <= 0 || totais.pesoBruto <= 0) {
           exibirErroModal('Informe pelo menos um peso bruto maior que zero.');
           return;
@@ -2549,7 +1583,6 @@
           return;
         }
 
-        produto.pesagensKg = totais.pesagensKg;
         produto.pesosCaixas = totais.pesos;
         produto.tipoCaixa = totais.tipoCaixa;
         produto.taraUnitaria = Number(totais.taraUnitaria.toFixed(3));
@@ -2580,10 +1613,8 @@
 
         // Sincronizar array de pesos correspondente para manter retrocompatibilidade com relatórios
         if (caixasTotais > 0 && itensPorCaixa > 0) {
-          produto.pesagensKg = [];
           produto.pesosCaixas = Array(caixasTotais).fill(itensPorCaixa);
         } else {
-          produto.pesagensKg = [];
           produto.pesosCaixas = [];
         }
 
@@ -2611,16 +1642,6 @@
       const mes = String(hoje.getMonth() + 1).padStart(2, '0');
       const dia = String(hoje.getDate()).padStart(2, '0');
       document.getElementById('dataConferencia').value = `${ano}-${mes}-${dia}`;
-
-      const campoUsuario = document.getElementById('usuario');
-      if (campoUsuario) {
-        campoUsuario.addEventListener('input', () => {
-          const inicio = campoUsuario.selectionStart;
-          const fim = campoUsuario.selectionEnd;
-          campoUsuario.value = campoUsuario.value.toUpperCase();
-          campoUsuario.setSelectionRange(inicio, fim);
-        });
-      }
 
       configurarEventosModal();
 
@@ -2793,12 +1814,12 @@
         <div class="produto-header">
           <div>Produto</div>
           <div>Caixas</div>
-          <div>Qtde/Peso Líquido Total</div>
+          <div>Qtd/Peso</div>
           <div></div>
         </div>
 
         <div class="ajuda">
-          Em <strong>Qtde/Peso Líquido Total</strong>,
+          Em <strong>Qtd/Peso</strong>,
           informe kg quando for produto pesado,
           ou unidade/maço/bandeja.
         </div>
@@ -2915,7 +1936,7 @@
         document.getElementById('dataConferencia').value;
 
       const usuario =
-        document.getElementById('usuario').value.trim().toUpperCase();
+        document.getElementById('usuario').value.trim();
 
       const observacaoGeral =
         document.getElementById('observacaoGeral').value.trim();
@@ -2940,9 +1961,6 @@
 
         pesosCaixas:
           produto.pesosCaixas || [],
-
-        pesagensKg:
-          produto.pesagensKg || [],
 
         observacao: produto.observacao || '',
         tipoCaixa: produto.tipoCaixa || '',
@@ -3000,7 +2018,7 @@
           <div class="review-header">
             <div>Produto</div>
             <div>Caixas</div>
-            <div>Qtde/Peso Líquido Total</div>
+            <div>Qtd/Peso</div>
           </div>
 
           ${payload.itens.map((item) => {
@@ -3228,8 +2246,6 @@
         itens:
           payload.itens.map(item => ({
 
-            codigo: item.codigo || '',
-
             produto: item.produto,
 
             caixas:
@@ -3240,9 +2256,6 @@
 
             unidade:
               item.unidade || '',
-
-            pesagensKg:
-              item.pesagensKg || [],
 
             observacao:
               item.observacao || '',
@@ -3270,8 +2283,6 @@
     }
 
     function mostrarPaginaSucesso(resposta) {
-      ultimaRespostaConferencia = resposta;
-
       const telaRevisao = document.getElementById('telaRevisao');
       const telaSucesso = document.getElementById('telaSucesso');
 
@@ -3362,22 +2373,6 @@
 
         <button
           class="btn"
-          onclick="mostrarTelaRelatorio()">
-
-          Gerar PDF de lançamento
-
-        </button>
-
-        <button
-          class="btn btn-secondary"
-          onclick="compartilharResumoConferencia()">
-
-          Compartilhar resumo
-
-        </button>
-
-        <button
-          class="btn btn-secondary"
           onclick="location.reload()">
 
           Nova conferência
@@ -3390,222 +2385,6 @@
       telaSucesso.style.display = 'block';
 
       window.scrollTo(0, 0);
-    }
-
-
-
-    function montarTextoCompartilhamento(resposta) {
-      if (!resposta) return '';
-
-      const linhas = [
-        'Conferência Hortifruti',
-        `Data: ${formatarDataBR(resposta.dataConferencia)}`,
-        `Conferente: ${resposta.usuario || '-'}`,
-        `Itens conferidos: ${resposta.totalItens || 0}`,
-        ''
-      ];
-
-      (resposta.itens || []).forEach(item => {
-        const unidade = item.unidade || 'kg/un';
-        let linha = `${item.produto}: ${formatarNumero(item.caixas)} cx | ${formatarNumero(item.qtdPeso)} ${unidade}`;
-
-        if (Number(item.pesoBruto || 0) > 0) {
-          linha += ` | Bruto: ${formatarNumero(item.pesoBruto)} ${unidade}`;
-          linha += ` | Tara: ${formatarNumero(item.taraTotal)} kg`;
-          linha += ` | Caixa: ${item.tipoCaixa || '-'}`;
-        }
-
-        if (item.observacao) {
-          linha += ` | Obs: ${item.observacao}`;
-        }
-
-        linhas.push(linha);
-      });
-
-      return linhas.join('\n');
-    }
-
-    async function compartilharResumoConferencia() {
-      const resposta = ultimaRespostaConferencia || montarRespostaLocal(ultimoPayload || montarPayload());
-      const texto = montarTextoCompartilhamento(resposta);
-
-      if (!texto) {
-        alert('Não há conferência para compartilhar.');
-        return;
-      }
-
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: 'Conferência Hortifruti',
-            text: texto
-          });
-          return;
-        } catch (erro) {
-          if (erro && erro.name === 'AbortError') return;
-        }
-      }
-
-      const urlWhatsApp = 'https://wa.me/?text=' + encodeURIComponent(texto);
-      window.open(urlWhatsApp, '_blank');
-    }
-
-    function mostrarTelaRelatorio() {
-      const resposta = ultimaRespostaConferencia || montarRespostaLocal(ultimoPayload || montarPayload());
-
-      if (!resposta || !resposta.itens || resposta.itens.length === 0) {
-        alert('Não há conferência para gerar relatório.');
-        return;
-      }
-
-      const telaEdicao = document.getElementById('telaEdicao');
-      const telaRevisao = document.getElementById('telaRevisao');
-      const telaSucesso = document.getElementById('telaSucesso');
-      const telaRelatorio = document.getElementById('telaRelatorio');
-
-      telaRelatorio.innerHTML = montarHtmlRelatorio(resposta);
-
-      telaEdicao.style.display = 'none';
-      telaRevisao.style.display = 'none';
-      telaSucesso.style.display = 'none';
-      telaRelatorio.style.display = 'block';
-
-      window.scrollTo(0, 0);
-    }
-
-    function voltarDoRelatorio() {
-      document.getElementById('telaRelatorio').style.display = 'none';
-      document.getElementById('telaSucesso').style.display = 'block';
-      window.scrollTo(0, 0);
-    }
-
-    function formatarDataArquivo(dataISO) {
-      if (!dataISO) return 'sem_data';
-
-      const partes = dataISO.split('-');
-
-      return `${partes[2]}.${partes[1]}.${partes[0]}`;
-    }
-
-    function imprimirRelatorio() {
-
-      const data =
-        formatarDataArquivo(
-          ultimoPayload?.dataConferencia
-        );
-
-      const tituloOriginal = document.title;
-
-      document.title =
-        `Relatorio_Conferencia_${data}`;
-
-      window.print();
-
-      setTimeout(() => {
-        document.title = tituloOriginal;
-      }, 1000);
-    }
-
-    function montarHtmlRelatorio(resposta) {
-      const itens = resposta.itens || [];
-      const observacaoGeral = resposta.observacaoGeral || (ultimoPayload && ultimoPayload.observacaoGeral) || '';
-
-      const linhasItens = itens.map((item) => {
-        const unidade = item.unidade || 'kg/un';
-        const itemPayload = ultimoPayload && ultimoPayload.itens
-          ? ultimoPayload.itens.find(origem =>
-            origem.codigo === item.codigo ||
-            origem.produto === item.produto
-          )
-          : null;
-
-        const codigoProduto = item.codigo || (itemPayload && itemPayload.codigo) || '-';
-
-        return `
-          <tr>
-            <td class="relatorio-produto">
-              <div class="relatorio-produto-nome">${escapeHtml(item.produto)}</div>
-              <div class="relatorio-produto-codigo">Cód. ${escapeHtml(codigoProduto)}</div>
-            </td>
-            <td class="relatorio-col-caixas">${formatarNumero(item.caixas)}</td>
-            <td class="relatorio-col-numero">${formatarNumero(item.qtdPeso)} ${escapeHtml(unidade)}</td>
-            <td class="relatorio-col-observacao">${escapeHtml(item.observacao || '-')}</td>
-          </tr>
-        `;
-      }).join('');
-
-      return `
-        <div class="header no-print">
-          <h1>Relatório de lançamento</h1>
-          <p>Visualização para impressão ou salvar como PDF.</p>
-        </div>
-
-        <div class="relatorio-acoes no-print">
-          <button class="btn" onclick="imprimirRelatorio()">
-            Imprimir / Salvar PDF
-          </button>
-
-          <button class="btn btn-secondary" onclick="compartilharResumoConferencia()">
-            Compartilhar resumo
-          </button>
-
-          <button class="btn btn-secondary" onclick="voltarDoRelatorio()">
-            Voltar
-          </button>
-        </div>
-
-        <div id="relatorioImpressao" class="relatorio-documento">
-          <div class="relatorio-topo">
-            <h1>RELATÓRIO DE LANÇAMENTO HORTIFRUTI</h1>
-            <p>Documento operacional de conferência</p>
-          </div>
-
-          <div class="relatorio-meta">
-            <div class="relatorio-meta-item">
-              <span class="relatorio-meta-label">Data</span>
-              ${escapeHtml(formatarDataBR(resposta.dataConferencia))}
-            </div>
-
-            <div class="relatorio-meta-item">
-              <span class="relatorio-meta-label">Conferente</span>
-              ${escapeHtml(resposta.usuario || '-')}
-            </div>
-
-            <div class="relatorio-meta-item">
-              <span class="relatorio-meta-label">Itens conferidos</span>
-              ${escapeHtml(String(resposta.totalItens || itens.length || 0))}
-            </div>
-          </div>
-
-          ${observacaoGeral ? `
-            <div class="relatorio-meta-item" style="margin-bottom: 12px;">
-              <span class="relatorio-meta-label">Observação geral</span>
-              ${escapeHtml(observacaoGeral)}
-            </div>
-          ` : ''}
-
-          <div class="relatorio-tabela-wrap">
-            <table class="relatorio-tabela">
-              <thead>
-                <tr>
-                <th>Produto</th>
-                <th>Caixas</th>
-                <th>Qtde/Peso Líquido Total</th>
-                <th>Observação</th>
-              </tr>
-              </thead>
-              <tbody>
-                ${linhasItens}
-              </tbody>
-            </table>
-          </div>
-
-          <div class="relatorio-assinatura">
-            <div class="relatorio-linha-assinatura"></div>
-            Assinatura do conferente
-          </div>
-        </div>
-      `;
     }
 
     function normalizarNumero(valor) {
@@ -3670,7 +2449,7 @@
   <div id="modalPesagem" class="modal-overlay" style="display: none;">
     <div class="modal-content">
       <div class="modal-header"
-        style="flex-direction: column; align-items: center; text-align: center; position: relative; width: 100%; border-bottom: 1px solid var(--border); padding: 12px 16px;">
+        style="flex-direction: column; align-items: center; text-align: center; position: relative; width: 100%; border-bottom: 1px solid var(--border); padding: 14px 16px;">
         <button type="button" class="modal-close" onclick="fecharModalPesagem()"
           style="position: absolute; right: 16px; top: 12px;">&times;</button>
         <h3 id="modalTituloTipo" style="margin: 0; font-size: 16px; color: var(--primary-dark); font-weight: bold;">
@@ -3681,7 +2460,7 @@
       </div>
       <div class="modal-body">
         <div id="modalTipoCaixaBox" class="modal-tara-box" style="display: none;">
-          <label for="modalTipoCaixa">Selecione o tipo de caixa/tara</label>
+          <label for="modalTipoCaixa">Tipo de caixa / tara</label>
           <select id="modalTipoCaixa"></select>
           <div id="modalTaraResumo" class="modal-tara-resumo" style="display: none;"></div>
         </div>
@@ -3694,7 +2473,7 @@
 
         <div class="modal-add-fixo">
           <button type="button" class="btn-add-caixa" id="btnAddCaixaModal">
-            ➕ Adicionar pesagem
+            ➕ Adicionar Caixa
           </button>
         </div>
 
@@ -3709,12 +2488,7 @@
           </div>
         </div>
 
-        <button type="button" class="btn-observacao-toggle" id="btnToggleObservacao"
-          onclick="alternarObservacaoModal()">
-          + Observação
-        </button>
-
-        <div class="modal-observacao-box" id="modalObservacaoBox">
+        <div class="modal-observacao-box">
           <label for="modalObservacaoProduto" id="modalObservacaoLabel">Observação (opcional)</label>
           <input type="text" id="modalObservacaoProduto" placeholder="Ex: caixa avariada, produto maduro...">
           <p class="modal-observacao-ajuda" id="modalObservacaoAjuda">
@@ -3724,8 +2498,6 @@
         </div>
       </div>
       <div class="modal-footer">
-        <div class="modal-erro-pesagem" id="modalErroPesagem"></div>
-
         <div class="modal-resumo" id="modalResumoTexto">
           Total: 0 caixas | 0 kg
         </div>
@@ -3747,10 +2519,6 @@
       <h3>Atenção</h3>
 
       <p>Este lançamento está sem desconto de tara.</p>
-
-      <p class="modal-alerta-pergunta">
-        Tem certeza que deseja continuar sem incluir o peso da caixa?
-      </p>
 
       <div id="resumoSemTara" class="modal-alerta-resumo"></div>
 
