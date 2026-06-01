@@ -1069,7 +1069,7 @@
       }
     }
 
-  
+
     .relatorio-tabela th:not(:first-child),
     .relatorio-tabela td:not(:first-child) {
       text-align: center;
@@ -1272,12 +1272,12 @@
 
 
     /* Ajustes de espaçamento da tela de revisão */
-    #telaRevisao .card > p {
+    #telaRevisao .card>p {
       padding-left: 6px;
       padding-right: 6px;
     }
 
-    #telaRevisao .review-row > div:first-child {
+    #telaRevisao .review-row>div:first-child {
       padding-left: 8px;
       padding-right: 6px;
     }
@@ -1632,51 +1632,7 @@
     #modalPesagem .modal-erro-pesagem.visivel {
       display: block;
     }
-
-
-    .status-relatorio-drive {
-      display: none;
-      grid-column: 1 / -1;
-      padding: 9px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: bold;
-      text-align: center;
-      line-height: 1.3;
-    }
-
-    .status-relatorio-drive.carregando,
-    .status-relatorio-drive.sucesso,
-    .status-relatorio-drive.erro {
-      display: block;
-    }
-
-    .status-relatorio-drive.carregando {
-      background: #eef8f1;
-      color: var(--primary-dark);
-    }
-
-    .status-relatorio-drive.sucesso {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .status-relatorio-drive.erro {
-      background: #fee2e2;
-      color: var(--danger);
-    }
-
-    .relatorio-acoes {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-
-    .relatorio-acoes .btn {
-      margin-bottom: 0;
-    }
-
-</style>
+  </style>
 </head>
 
 <body>
@@ -1801,7 +1757,6 @@
     let ultimoPayload = null;
     let ultimaRespostaConferencia = null;
     let envioEmAndamento = false;
-    let salvamentoDriveEmAndamento = false;
     let modalIndexAtual = null;
 
     function getProdutoModalAtual() {
@@ -2132,9 +2087,9 @@
       const dados = typeof pesagem === 'object' && pesagem !== null
         ? pesagem
         : {
-            caixas: pesagem ? 1 : '',
-            pesoBruto: pesagem || ''
-          };
+          caixas: pesagem ? 1 : '',
+          pesoBruto: pesagem || ''
+        };
 
       const row = document.createElement('div');
       row.className = 'peso-row pesagem-row';
@@ -2629,7 +2584,7 @@
           produto.pesosCaixas = Array(caixasTotais).fill(itensPorCaixa);
         } else {
           produto.pesagensKg = [];
-      produto.pesosCaixas = [];
+          produto.pesosCaixas = [];
         }
 
         produto.tipoCaixa = '';
@@ -2670,7 +2625,6 @@
       configurarEventosModal();
 
       prepararIframeEnvio();
-      prepararIframeDrive();
 
       carregarTiposCaixa();
 
@@ -3528,133 +3482,28 @@
     function formatarDataArquivo(dataISO) {
       if (!dataISO) return 'sem_data';
 
-      const partes = String(dataISO).split('-');
-
-      if (partes.length !== 3) {
-        return String(dataISO).replace(/[^0-9a-zA-Z._-]/g, '_');
-      }
+      const partes = dataISO.split('-');
 
       return `${partes[2]}.${partes[1]}.${partes[0]}`;
     }
 
-    function gerarNomeArquivoRelatorio(dataISO) {
-      return `Relatorio_Conferencia_${formatarDataArquivo(dataISO)}`;
-    }
-
     function imprimirRelatorio() {
-      const resposta =
-        ultimaRespostaConferencia ||
-        montarRespostaLocal(ultimoPayload || montarPayload());
+
+      const data =
+        formatarDataArquivo(
+          ultimoPayload?.dataConferencia
+        );
 
       const tituloOriginal = document.title;
 
-      document.title = gerarNomeArquivoRelatorio(
-        resposta && resposta.dataConferencia
-          ? resposta.dataConferencia
-          : ultimoPayload && ultimoPayload.dataConferencia
-      );
+      document.title =
+        `Relatorio_Conferencia_${data}`;
 
       window.print();
 
       setTimeout(() => {
         document.title = tituloOriginal;
       }, 1000);
-    }
-
-    function prepararIframeDrive() {
-      if (document.getElementById('iframeDrive')) return;
-
-      const iframe = document.createElement('iframe');
-
-      iframe.name = 'iframeDrive';
-      iframe.id = 'iframeDrive';
-      iframe.style.display = 'none';
-
-      iframe.addEventListener('load', () => {
-        if (!salvamentoDriveEmAndamento) return;
-
-        salvamentoDriveEmAndamento = false;
-
-        const status = document.getElementById('statusRelatorioDrive');
-        if (status) {
-          status.className = 'status-relatorio-drive sucesso';
-          status.textContent = 'PDF enviado para salvar no Drive.';
-        }
-      });
-
-      document.body.appendChild(iframe);
-    }
-
-    function salvarRelatorioDrive() {
-      if (IS_LOCAL) {
-        const status = document.getElementById('statusRelatorioDrive');
-        if (status) {
-          status.className = 'status-relatorio-drive erro';
-          status.textContent = 'O salvamento no Drive só funciona após deploy, usando o Apps Script.';
-        }
-        return;
-      }
-
-      if (!validarConfiguracao()) return;
-
-      const resposta =
-        ultimaRespostaConferencia ||
-        montarRespostaLocal(ultimoPayload || montarPayload());
-
-      if (!resposta || !resposta.itens || resposta.itens.length === 0) {
-        alert('Não há relatório para salvar.');
-        return;
-      }
-
-      prepararIframeDrive();
-
-      const status = document.getElementById('statusRelatorioDrive');
-      if (status) {
-        status.className = 'status-relatorio-drive carregando';
-        status.textContent = 'Salvando PDF no Drive...';
-      }
-
-      const payloadDrive = {
-        tipoRelatorio: 'lancamento',
-        nomeArquivo: gerarNomeArquivoRelatorio(resposta.dataConferencia),
-        dataConferencia: resposta.dataConferencia,
-        usuario: resposta.usuario || '',
-        observacaoGeral:
-          resposta.observacaoGeral ||
-          (ultimoPayload && ultimoPayload.observacaoGeral) ||
-          '',
-        totalItens: resposta.totalItens || (resposta.itens || []).length,
-        itens: resposta.itens || []
-      };
-
-      const formAntigo = document.getElementById('formDriveOculto');
-      if (formAntigo) formAntigo.remove();
-
-      const form = document.createElement('form');
-
-      form.id = 'formDriveOculto';
-      form.method = 'POST';
-      form.action = APPS_SCRIPT_URL;
-      form.target = 'iframeDrive';
-      form.style.display = 'none';
-
-      const inputAction = document.createElement('input');
-      inputAction.type = 'hidden';
-      inputAction.name = 'action';
-      inputAction.value = 'salvarPdfLancamento';
-
-      const inputPayload = document.createElement('input');
-      inputPayload.type = 'hidden';
-      inputPayload.name = 'payload';
-      inputPayload.value = JSON.stringify(payloadDrive);
-
-      form.appendChild(inputAction);
-      form.appendChild(inputPayload);
-      document.body.appendChild(form);
-
-      salvamentoDriveEmAndamento = true;
-
-      form.submit();
     }
 
     function montarHtmlRelatorio(resposta) {
@@ -3665,9 +3514,9 @@
         const unidade = item.unidade || 'kg/un';
         const itemPayload = ultimoPayload && ultimoPayload.itens
           ? ultimoPayload.itens.find(origem =>
-              origem.codigo === item.codigo ||
-              origem.produto === item.produto
-            )
+            origem.codigo === item.codigo ||
+            origem.produto === item.produto
+          )
           : null;
 
         const codigoProduto = item.codigo || (itemPayload && itemPayload.codigo) || '-';
@@ -3696,10 +3545,6 @@
             Imprimir / Salvar PDF
           </button>
 
-          <button class="btn btn-secondary" onclick="salvarRelatorioDrive()">
-            Salvar no Drive
-          </button>
-
           <button class="btn btn-secondary" onclick="compartilharResumoConferencia()">
             Compartilhar resumo
           </button>
@@ -3707,8 +3552,6 @@
           <button class="btn btn-secondary" onclick="voltarDoRelatorio()">
             Voltar
           </button>
-
-          <div id="statusRelatorioDrive" class="status-relatorio-drive"></div>
         </div>
 
         <div id="relatorioImpressao" class="relatorio-documento">
@@ -3866,7 +3709,8 @@
           </div>
         </div>
 
-        <button type="button" class="btn-observacao-toggle" id="btnToggleObservacao" onclick="alternarObservacaoModal()">
+        <button type="button" class="btn-observacao-toggle" id="btnToggleObservacao"
+          onclick="alternarObservacaoModal()">
           + Observação
         </button>
 
