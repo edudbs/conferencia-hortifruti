@@ -249,3 +249,120 @@ function consultarPdfLancamento_(e) {
 
   return responder_(JSON.parse(valor), e);
 }
+
+
+function regenerarPdfLancamento_(e) {
+  const dataEnvioFiltro = String(e.parameter.dataEnvio || '').trim();
+
+  if (!dataEnvioFiltro) {
+    throw new Error('Informe dataEnvio.');
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const aba = ss.getSheetByName('CONFERENCIAS');
+
+  if (!aba) {
+    throw new Error('Aba CONFERENCIAS não encontrada.');
+  }
+
+  const dados = aba.getDataRange().getValues();
+  const cabecalho = dados[0];
+
+  const idx = nome => cabecalho.indexOf(nome);
+
+  const linhas = dados.slice(1).filter(linha => {
+    const dataEnvio = linha[idx('data_envio')];
+
+    const textoDataEnvio =
+      dataEnvio instanceof Date
+        ? Utilities.formatDate(dataEnvio, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss')
+        : String(dataEnvio).trim();
+
+    return textoDataEnvio === dataEnvioFiltro;
+  });
+
+  if (linhas.length === 0) {
+    throw new Error('Nenhuma conferência encontrada para data_envio: ' + dataEnvioFiltro);
+  }
+
+  const primeira = linhas[0];
+
+  const payload = {
+    tipoRelatorio: 'lancamento',
+    nomeArquivo: 'Relatorio_Conferencia_' + dataEnvioFiltro.replace(/[/: ]/g, '_'),
+    dataConferencia: primeira[idx('data_conferencia')] instanceof Date
+      ? Utilities.formatDate(
+        primeira[idx('data_conferencia')],
+        Session.getScriptTimeZone(),
+        'dd/MM/yyyy'
+      )
+    : primeira[idx('data_conferencia')],
+    usuario: primeira[idx('usuario')] || '',
+    observacaoGeral: primeira[idx('observacao_geral')] || '',
+    totalItens: linhas.length,
+    itens: linhas.map(linha => ({
+      codigo: linha[idx('codigo')],
+      produto: linha[idx('produto')],
+      caixas: linha[idx('caixas')],
+      qtdPeso: linha[idx('qtd_peso')],
+      unidade: linha[idx('unidade')],
+      observacao: linha[idx('observacao')] || ''
+    }))
+  };
+
+  const html = montarHtmlPdfLancamento_(payload);
+
+  const blob = Utilities
+    .newBlob(html, MimeType.HTML, payload.nomeArquivo + '.html')
+    .getAs(MimeType.PDF)
+    .setName(payload.nomeArquivo + '.pdf');
+
+  const pasta = DriveApp.getFolderById(ID_PASTA_RELATORIOS_LANCAMENTO);
+  const arquivo = pasta.createFile(blob);
+
+  return responder_({
+    sucesso: true,
+    nomeArquivo: arquivo.getName(),
+    fileId: arquivo.getId(),
+    url: arquivo.getUrl()
+  }, e);
+}
+
+
+function diagnosticarDatasEnvio_(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const aba = ss.getSheetByName('CONFERENCIAS');
+
+  if (!aba) {
+    throw new Error('Aba CONFERENCIAS não encontrada.');
+  }
+
+  const dados = aba.getDataRange().getValues();
+  const cabecalho = dados[0];
+  const idxDataEnvio = cabecalho.indexOf('data_envio');
+
+  if (idxDataEnvio === -1) {
+    throw new Error('Coluna data_envio não encontrada.');
+  }
+
+  const timezone = Session.getScriptTimeZone();
+
+  const datas = dados.slice(1, 20).map((linha, i) => {
+    const valor = linha[idxDataEnvio];
+
+    return {
+      linha: i + 2,
+      bruto: String(valor),
+      tipo: Object.prototype.toString.call(valor),
+      formatado:
+        valor instanceof Date
+          ? Utilities.formatDate(valor, timezone, 'dd/MM/yyyy HH:mm:ss')
+          : String(valor).trim()
+    };
+  });
+
+  return responder_({
+    sucesso: true,
+    datas: datas
+  }, e);
+}
