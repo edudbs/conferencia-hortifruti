@@ -3536,8 +3536,15 @@
       return `${partes[2]}.${partes[1]}.${partes[0]}`;
     }
 
-    function gerarNomeArquivoRelatorio(dataISO) {
-      return `Relatorio_Conferencia_${formatarDataArquivo(dataISO)}`;
+    function gerarNomeArquivoRelatorio(dataConferencia) {
+      const data = formatarDataRelatorio(dataConferencia).replace(/\//g, '.');
+
+      const agora = new Date();
+
+      const hora = String(agora.getHours()).padStart(2, '0');
+      const minuto = String(agora.getMinutes()).padStart(2, '0');
+
+      return `Relatorio_Conferencia_${data}_${hora}.${minuto}`;
     }
 
     function imprimirRelatorio() {
