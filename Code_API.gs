@@ -37,6 +37,14 @@ function doGet(e) {
       return diagnosticarDatasEnvio_(e);
     }
 
+    if (action === 'telaPdfLancamento') {
+      return telaPdfLancamento_();
+    }
+
+    if (action === 'gerarPdfLancamentoPorData') {
+      return gerarPdfLancamentoPorData_(e);
+    }
+
     return responder_({
       sucesso: true,
       mensagem: 'API Conferência Hortifruti ativa.',

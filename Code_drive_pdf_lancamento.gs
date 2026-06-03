@@ -99,13 +99,14 @@ function montarHtmlPdfLancamento_(payload) {
     + '<style>'
     + '@page { size: A4; margin: 14mm; }'
     + 'body { font-family: Arial, sans-serif; color: #1f2933; font-size: 12px; }'
-    + '.topo { text-align: center; margin-bottom: 14px; }'
+    + '.topo { text-align: center; margin-bottom: 30px; }'
     + '.topo h1 { margin: 0; color: #166c3a; font-size: 18px; }'
-    + '.topo p { margin: 4px 0 0; color: #6b7280; }'
-    + '.meta { display: table; width: 100%; margin-bottom: 12px; border-collapse: collapse; }'
+    + '.topo p { margin-top: 10px 0 0; color: #6b7280; font-size: 16px; font-weight: bold }'
+    + '.meta { display: table; width: 100%; margin-bottom: 30px; border-collapse: collapse; }'
     + '.meta-item { display: table-cell; border: 1px solid #e5e7eb; padding: 8px; vertical-align: middle; }'
+    + '.meta-col { width: 33.33%; }'
     + '.meta-item span { display: block; color: #6b7280; font-size: 10px; font-weight: bold; margin-bottom: 3px; text-transform: uppercase; }'
-    + '.obs-geral { display: block; margin-bottom: 12px; }'
+    + '.obs-geral { display: block; margin-bottom: 30px; }'
     + 'table { width: 100%; border-collapse: collapse; table-layout: fixed; }'
     + 'th, td { border: 1px solid #e5e7eb; padding: 7px; vertical-align: middle; }'
     + 'th { background: #eef8f1; color: #166c3a; text-align: center; font-size: 11px; }'
@@ -116,7 +117,7 @@ function montarHtmlPdfLancamento_(payload) {
     + '.produto { text-align: left !important; }'
     + '.produto-nome { font-weight: bold; line-height: 1.2; }'
     + '.produto-codigo { margin-top: 3px; color: #6b7280; font-size: 10px; }'
-    + '.assinatura { margin-top: 34px; text-align: center; color: #6b7280; }'
+    + '.assinatura { margin-top: 70px; text-align: center; color: #6b7280; }'
     + '.linha-assinatura { width: 260px; border-top: 1px solid #6b7280; margin: 0 auto 6px; }'
     + '</style>'
     + '</head>'
@@ -126,9 +127,9 @@ function montarHtmlPdfLancamento_(payload) {
     + '<p>Documento operacional de conferência</p>'
     + '</div>'
     + '<div class="meta">'
-    + '<div class="meta-item"><span>Data</span>' + escaparHtml_(formatarDataBRApps_(payload.dataConferencia)) + '</div>'
-    + '<div class="meta-item"><span>Conferente</span>' + escaparHtml_(payload.usuario || '-') + '</div>'
-    + '<div class="meta-item"><span>Itens conferidos</span>' + escaparHtml_(String(payload.totalItens || itens.length || 0)) + '</div>'
+    + '<div class="meta-item meta-col"><span>Data</span>' + escaparHtml_(formatarDataBRApps_(payload.dataConferencia)) + '</div>'
+    + '<div class="meta-item meta-col"><span>Conferente</span>' + escaparHtml_(payload.usuario || '-') + '</div>'
+    + '<div class="meta-item meta-col"><span>Itens conferidos</span>' + escaparHtml_(String(payload.totalItens || itens.length || 0)) + '</div>'
     + '</div>'
     + observacaoGeral
     + '<table>'
@@ -365,4 +366,327 @@ function diagnosticarDatasEnvio_(e) {
     sucesso: true,
     datas: datas
   }, e);
+}
+
+
+function gerarPdfLancamentoPorData_(e) {
+  const dataFiltro = String(e.parameter.dataConferencia || '').trim();
+
+  const resultado = gerarPdfLancamentoPorDataObjeto_(dataFiltro);
+
+  return responder_(resultado, e);
+}
+
+
+function gerarPdfLancamentoPorDataDireto(dataFiltro) {
+  return gerarPdfLancamentoPorDataObjeto_(dataFiltro);
+}
+
+
+function gerarPdfLancamentoPorDataObjeto_(dataFiltro) {
+  dataFiltro = String(dataFiltro || '').trim();
+
+  if (!dataFiltro) {
+    throw new Error('Informe a data da conferência.');
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const aba = ss.getSheetByName('CONFERENCIAS');
+
+  if (!aba) {
+    throw new Error('Aba CONFERENCIAS não encontrada.');
+  }
+
+  const dados = aba.getDataRange().getValues();
+
+  if (!dados || dados.length < 2) {
+    throw new Error('A aba CONFERENCIAS está vazia.');
+  }
+
+  const cabecalho = dados[0].map(function(h) {
+    return String(h).trim();
+  });
+
+  const idx = function(nome) {
+    return cabecalho.indexOf(nome);
+  };
+
+  const idxDataConferencia = idx('data_conferencia');
+
+  if (idxDataConferencia === -1) {
+    throw new Error('Coluna data_conferencia não encontrada.');
+  }
+
+  const timezone = Session.getScriptTimeZone();
+
+  const linhas = dados.slice(1).filter(function(linha) {
+    const valor = linha[idxDataConferencia];
+
+    const dataLinha =
+      valor instanceof Date
+        ? Utilities.formatDate(valor, timezone, 'yyyy-MM-dd')
+        : String(valor).trim();
+
+    return dataLinha === dataFiltro;
+  });
+
+  if (linhas.length === 0) {
+    throw new Error('Nenhuma conferência encontrada para a data: ' + dataFiltro);
+  }
+
+  const primeira = linhas[0];
+
+  const payload = {
+    tipoRelatorio: 'lancamento',
+    nomeArquivo: 'Relatorio_Conferencia_' + formatarDataArquivoApps_(dataFiltro),
+    dataConferencia: dataFiltro,
+    usuario: primeira[idx('usuario')] || '',
+    observacaoGeral: primeira[idx('observacao_geral')] || '',
+    totalItens: linhas.length,
+    itens: linhas.map(function(linha) {
+      return {
+        codigo: linha[idx('codigo')],
+        produto: linha[idx('produto')],
+        caixas: linha[idx('caixas')],
+        qtdPeso: linha[idx('qtd_peso')],
+        unidade: linha[idx('unidade')],
+        observacao: linha[idx('observacao')] || ''
+      };
+    })
+  };
+
+  const html = montarHtmlPdfLancamento_(payload);
+
+  const blob = Utilities
+    .newBlob(html, MimeType.HTML, payload.nomeArquivo + '.html')
+    .getAs(MimeType.PDF)
+    .setName(payload.nomeArquivo + '.pdf');
+
+  const pasta = DriveApp.getFolderById(ID_PASTA_RELATORIOS_LANCAMENTO);
+  const arquivo = pasta.createFile(blob);
+
+  return {
+    sucesso: true,
+    nomeArquivo: arquivo.getName(),
+    fileId: arquivo.getId(),
+    url: arquivo.getUrl()
+  };
+}
+
+function telaPdfLancamento_() {
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f7f5;
+      color: #1f2933;
+    }
+
+    .card {
+      max-width: 420px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-top: 0;
+      color: #166c3a;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    input,
+    button {
+      width: 100%;
+      font-size: 16px;
+      padding: 12px;
+      box-sizing: border-box;
+      border-radius: 10px;
+    }
+
+    input {
+      border: 1px solid #d1d5db;
+      margin-bottom: 14px;
+    }
+
+    button {
+      border: 0;
+      background: #166c3a;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .resultado {
+      margin-top: 16px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    a {
+      color: #166c3a;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Gerar PDF de Conferência</h1>
+
+    <label for="data">Data da conferência</label>
+    <input id="data" type="date">
+
+    <button onclick="gerarPdf()">Gerar PDF</button>
+
+    <div id="resultado" class="resultado"></div>
+  </div>
+
+  <script>
+    function gerarPdf() {
+      var data = document.getElementById('data').value;
+      var resultado = document.getElementById('resultado');
+
+      if (!data) {
+        resultado.innerHTML = 'Informe uma data.';
+        return;
+      }
+
+      resultado.innerHTML = 'Gerando PDF...';
+
+      var url = location.href.split('?')[0]
+        + '?action=gerarPdfLancamentoPorData'
+        + '&dataConferencia=' + encodeURIComponent(data);
+
+      fetch(url)
+        .then(function(resp) {
+          return resp.json();
+        })
+        .then(function(dados) {
+          if (!dados.sucesso) {
+            resultado.innerHTML = 'Erro: ' + (dados.erro || 'falha ao gerar PDF.');
+            return;
+          }
+
+          resultado.innerHTML =
+            'PDF gerado com sucesso:<br><br>' +
+            '<a href="' + dados.url + '" target="_blank">Abrir PDF</a>';
+        })
+        .catch(function(erro) {
+          resultado.innerHTML = 'Erro ao gerar PDF: ' + erro.message;
+        });
+    }
+  </script>
+</body>
+</html>`;
+
+  return HtmlService
+    .createHtmlOutput(html)
+    .setTitle('Gerar PDF de Conferência');
+}
+
+
+function gerarPdfLancamentoPorDataObjeto_(dataFiltro) {
+  dataFiltro = String(dataFiltro || '').trim();
+
+  if (!dataFiltro) {
+    throw new Error('Informe a data da conferência.');
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const aba = ss.getSheetByName('CONFERENCIAS');
+
+  if (!aba) {
+    throw new Error('Aba CONFERENCIAS não encontrada.');
+  }
+
+  const dados = aba.getDataRange().getValues();
+
+  if (!dados || dados.length < 2) {
+    throw new Error('A aba CONFERENCIAS está vazia.');
+  }
+
+  const cabecalho = dados[0].map(function(h) {
+    return String(h).trim();
+  });
+
+  const idx = function(nome) {
+    return cabecalho.indexOf(nome);
+  };
+
+  const idxDataConferencia = idx('data_conferencia');
+
+  if (idxDataConferencia === -1) {
+    throw new Error('Coluna data_conferencia não encontrada.');
+  }
+
+  const timezone = Session.getScriptTimeZone();
+
+  const linhas = dados.slice(1).filter(function(linha) {
+    const valor = linha[idxDataConferencia];
+
+    const dataLinha =
+      valor instanceof Date
+        ? Utilities.formatDate(valor, timezone, 'yyyy-MM-dd')
+        : String(valor).trim();
+
+    return dataLinha === dataFiltro;
+  });
+
+  if (linhas.length === 0) {
+    throw new Error('Nenhuma conferência encontrada para a data: ' + dataFiltro);
+  }
+
+  const primeira = linhas[0];
+
+  const payload = {
+    tipoRelatorio: 'lancamento',
+    nomeArquivo: 'Relatorio_Conferencia_' + formatarDataArquivoApps_(dataFiltro),
+    dataConferencia: dataFiltro,
+    usuario: primeira[idx('usuario')] || '',
+    observacaoGeral: primeira[idx('observacao_geral')] || '',
+    totalItens: linhas.length,
+    itens: linhas.map(function(linha) {
+      return {
+        codigo: linha[idx('codigo')],
+        produto: linha[idx('produto')],
+        caixas: linha[idx('caixas')],
+        qtdPeso: linha[idx('qtd_peso')],
+        unidade: linha[idx('unidade')],
+        observacao: linha[idx('observacao')] || ''
+      };
+    })
+  };
+
+  const html = montarHtmlPdfLancamento_(payload);
+
+  const blob = Utilities
+    .newBlob(html, MimeType.HTML, payload.nomeArquivo + '.html')
+    .getAs(MimeType.PDF)
+    .setName(payload.nomeArquivo + '.pdf');
+
+  const pasta = DriveApp.getFolderById(ID_PASTA_RELATORIOS_LANCAMENTO);
+  const arquivo = pasta.createFile(blob);
+
+  return {
+    sucesso: true,
+    nomeArquivo: arquivo.getName(),
+    fileId: arquivo.getId(),
+    url: arquivo.getUrl()
+  };
 }
