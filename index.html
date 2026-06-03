@@ -1632,6 +1632,49 @@
     #modalPesagem .modal-erro-pesagem.visivel {
       display: block;
     }
+
+
+    .status-relatorio-drive {
+      display: none;
+      grid-column: 1 / -1;
+      padding: 9px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .status-relatorio-drive.carregando,
+    .status-relatorio-drive.sucesso,
+    .status-relatorio-drive.erro {
+      display: block;
+    }
+
+    .status-relatorio-drive.carregando {
+      background: #eef8f1;
+      color: var(--primary-dark);
+    }
+
+    .status-relatorio-drive.sucesso {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-relatorio-drive.erro {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .relatorio-acoes {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .relatorio-acoes .btn {
+      margin-bottom: 0;
+    }
   </style>
 </head>
 
@@ -1757,6 +1800,7 @@
     let ultimoPayload = null;
     let ultimaRespostaConferencia = null;
     let envioEmAndamento = false;
+    let salvamentoDriveEmAndamento = false;
     let modalIndexAtual = null;
 
     function getProdutoModalAtual() {
@@ -2625,6 +2669,7 @@
       configurarEventosModal();
 
       prepararIframeEnvio();
+      prepararIframeDrive();
 
       carregarTiposCaixa();
 
@@ -3482,28 +3527,142 @@
     function formatarDataArquivo(dataISO) {
       if (!dataISO) return 'sem_data';
 
-      const partes = dataISO.split('-');
+      const partes = String(dataISO).split('-');
+
+      if (partes.length !== 3) {
+        return String(dataISO).replace(/[^0-9a-zA-Z._-]/g, '_');
+      }
 
       return `${partes[2]}.${partes[1]}.${partes[0]}`;
     }
 
-    function imprimirRelatorio() {
+    function gerarNomeArquivoRelatorio(dataISO) {
+      return `Relatorio_Conferencia_${formatarDataArquivo(dataISO)}`;
+    }
 
-      const data =
-        formatarDataArquivo(
-          ultimoPayload?.dataConferencia
-        );
+    function imprimirRelatorio() {
+      const resposta =
+        ultimaRespostaConferencia ||
+        montarRespostaLocal(ultimoPayload || montarPayload());
 
       const tituloOriginal = document.title;
 
-      document.title =
-        `Relatorio_Conferencia_${data}`;
+      document.title = gerarNomeArquivoRelatorio(
+        resposta && resposta.dataConferencia
+          ? resposta.dataConferencia
+          : ultimoPayload && ultimoPayload.dataConferencia
+      );
 
       window.print();
 
       setTimeout(() => {
         document.title = tituloOriginal;
       }, 1000);
+    }
+
+    function prepararIframeDrive() {
+      if (document.getElementById('iframeDrive')) return;
+
+      const iframe = document.createElement('iframe');
+
+      iframe.name = 'iframeDrive';
+      iframe.id = 'iframeDrive';
+      iframe.style.display = 'none';
+
+      document.body.appendChild(iframe);
+    }
+
+    function salvarRelatorioDrive() {
+      if (IS_LOCAL) {
+        const status = document.getElementById('statusRelatorioDrive');
+        if (status) {
+          status.className = 'status-relatorio-drive erro';
+          status.textContent = 'O salvamento no Drive só funciona após deploy, usando o Apps Script.';
+        }
+        return;
+      }
+
+      if (!validarConfiguracao()) return;
+      if (salvamentoDriveEmAndamento) return;
+
+      const resposta =
+        ultimaRespostaConferencia ||
+        montarRespostaLocal(ultimoPayload || montarPayload());
+
+      if (!resposta || !resposta.itens || resposta.itens.length === 0) {
+        alert('Não há relatório para salvar.');
+        return;
+      }
+
+      prepararIframeDrive();
+
+      const requestId =
+        'pdf_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+
+      const status = document.getElementById('statusRelatorioDrive');
+      const btnSalvarDrive = document.getElementById('btnSalvarDrive');
+
+      if (btnSalvarDrive) {
+        btnSalvarDrive.disabled = true;
+        btnSalvarDrive.textContent = 'Salvando...';
+      }
+
+      if (status) {
+        status.className = 'status-relatorio-drive carregando';
+        status.textContent = 'Salvando PDF no Drive...';
+      }
+
+      const payloadDrive = {
+        tipoRelatorio: 'lancamento',
+        requestId: requestId,
+        nomeArquivo: gerarNomeArquivoRelatorio(resposta.dataConferencia),
+        dataConferencia: resposta.dataConferencia,
+        usuario: resposta.usuario || '',
+        observacaoGeral:
+          resposta.observacaoGeral ||
+          (ultimoPayload && ultimoPayload.observacaoGeral) ||
+          '',
+        totalItens: resposta.totalItens || (resposta.itens || []).length,
+        itens: resposta.itens || []
+      };
+
+      const formAntigo = document.getElementById('formDriveOculto');
+      if (formAntigo) formAntigo.remove();
+
+      const form = document.createElement('form');
+
+      form.id = 'formDriveOculto';
+      form.method = 'POST';
+      form.action = APPS_SCRIPT_URL;
+      form.target = 'iframeDrive';
+      form.style.display = 'none';
+
+      const inputAction = document.createElement('input');
+      inputAction.type = 'hidden';
+      inputAction.name = 'action';
+      inputAction.value = 'salvarPdfLancamento';
+
+      const inputPayload = document.createElement('input');
+      inputPayload.type = 'hidden';
+      inputPayload.name = 'payload';
+      inputPayload.value = JSON.stringify(payloadDrive);
+
+      const inputRequestId = document.createElement('input');
+      inputRequestId.type = 'hidden';
+      inputRequestId.name = 'requestId';
+      inputRequestId.value = requestId;
+
+      form.appendChild(inputAction);
+      form.appendChild(inputPayload);
+      form.appendChild(inputRequestId);
+
+      document.body.appendChild(form);
+
+      salvamentoDriveEmAndamento = true;
+
+      form.submit();
+
+      consultarPdfDrive(requestId);
     }
 
     function montarHtmlRelatorio(resposta) {
@@ -3545,6 +3704,10 @@
             Imprimir / Salvar PDF
           </button>
 
+          <button class="btn btn-secondary" id="btnSalvarDrive" onclick="salvarRelatorioDrive()">
+            Salvar no Drive
+          </button>
+
           <button class="btn btn-secondary" onclick="compartilharResumoConferencia()">
             Compartilhar resumo
           </button>
@@ -3552,6 +3715,8 @@
           <button class="btn btn-secondary" onclick="voltarDoRelatorio()">
             Voltar
           </button>
+
+          <div id="statusRelatorioDrive" class="status-relatorio-drive"></div>
         </div>
 
         <div id="relatorioImpressao" class="relatorio-documento">
@@ -3662,6 +3827,102 @@
         .replace(/"/g, '&quot;')
 
         .replace(/'/g, '&#039;');
+    }
+
+
+    function consultarPdfDrive(requestId, tentativa = 0) {
+      if (tentativa > 20) {
+        salvamentoDriveEmAndamento = false;
+
+        const status = document.getElementById('statusRelatorioDrive');
+        const btn = document.getElementById('btnSalvarDrive');
+
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Salvar no Drive';
+        }
+
+        if (status) {
+          status.className = 'status-relatorio-drive erro';
+          status.textContent =
+            'PDF pode ter sido salvo, mas não foi possível obter o link.';
+        }
+
+        return;
+      }
+
+      const callbackName =
+        'receberPdfDrive_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+
+      window[callbackName] = function (dados) {
+        try {
+          console.log('Resposta consultarPdfDrive:', dados);
+
+          if (!dados || dados.pendente) {
+            setTimeout(() => {
+              consultarPdfDrive(requestId, tentativa + 1);
+            }, 1000);
+            return;
+          }
+
+          if (!dados.url && !dados.erro) {
+            setTimeout(() => {
+              consultarPdfDrive(requestId, tentativa + 1);
+            }, 1000);
+            return;
+          }
+
+          salvamentoDriveEmAndamento = false;
+
+          const status = document.getElementById('statusRelatorioDrive');
+          const btn = document.getElementById('btnSalvarDrive');
+
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Salvar no Drive';
+          }
+
+          if (!status) return;
+
+          if (dados.sucesso && dados.url) {
+            status.className = 'status-relatorio-drive sucesso';
+            status.innerHTML =
+              'PDF salvo no Drive com sucesso.<br>' +
+              '<a href="' + dados.url + '" target="_blank" rel="noopener noreferrer">Abrir PDF</a>';
+          } else {
+            status.className = 'status-relatorio-drive erro';
+            status.textContent =
+              'Erro ao salvar PDF no Drive: ' + (dados.erro || 'erro desconhecido.');
+          }
+        } finally {
+          delete window[callbackName];
+
+          const script = document.getElementById(callbackName);
+          if (script) script.remove();
+        }
+      };
+
+      const script = document.createElement('script');
+      script.id = callbackName;
+      script.src =
+        APPS_SCRIPT_URL +
+        '?action=consultarPdfLancamento' +
+        '&requestId=' + encodeURIComponent(requestId) +
+        '&callback=' + encodeURIComponent(callbackName) +
+        '&t=' + Date.now();
+
+      script.onerror = () => {
+        delete window[callbackName];
+
+        const antigo = document.getElementById(callbackName);
+        if (antigo) antigo.remove();
+
+        setTimeout(() => {
+          consultarPdfDrive(requestId, tentativa + 1);
+        }, 1000);
+      };
+
+      document.body.appendChild(script);
     }
 
   </script>
